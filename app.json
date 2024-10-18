@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Nex",
+    "slug": "Nex",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icons/android/mipmap-hdpi/ic_launcher.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icons/android/mipmap-hdpi/ic_launcher.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/android/mipmap-hdpi/ic_launcher.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.mahdimoradiz.Nex"
+    },
+    "web": {
+      "favicon": "./assets/icons/android/mipmap-hdpi/ic_launcher.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-localization"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "122a4fee-19f5-41f8-a393-770a31546fb6"
+      }
+    }
+  }
+}

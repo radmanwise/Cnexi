@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  SafeAreaView,
+  Platform,
+  Dimensions,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import ipconfig from '../config/ipconfig';
+import AddIcon from '../components/icons/AddIcon';
+
+const { width } = Dimensions.get('window');
 
 const TopMenu = () => {
   const [loading, setLoading] = useState(true);
@@ -22,12 +34,13 @@ const TopMenu = () => {
         }
 
         const userResponse = await axios.get(`${ipconfig.BASE_URL}/api/v1/user/profile/`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
+
         const username = userResponse.data.user.username;
 
         const profileResponse = await axios.get(`${ipconfig.BASE_URL}/profile/${username}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         setProfileData(profileResponse.data);
@@ -41,63 +54,74 @@ const TopMenu = () => {
     fetchProfileData();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.topMenu}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.button}>
-        <Ionicons name="arrow-back" size={25} color="black" />
-      </TouchableOpacity>
-      <Text style={styles.title}>
-        {profileData?.name && profileData.name.length > 18
-          ? `${profileData.name.substring(0, 18)}...`
-          : profileData?.name || 'User'}
-      </Text>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Settings')}>
-        <Feather name="menu" size={26} color="black" />
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.topMenu}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.button}>
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+
+        {loading ? (
+          <ActivityIndicator size="small" color="#555" style={styles.title} />
+        ) : (
+          <Text style={styles.title}>
+            {profileData?.name?.length > 18
+              ? profileData.name.slice(0, 18) + '...'
+              : profileData?.name || '...'}
+          </Text>
+        )}
+
+        <View style={styles.rightIcons}>
+          <TouchableOpacity onPress={() => navigation.navigate('AddPostScreen')} style={styles.iconButton}>
+            <AddIcon size={24} color="#1e1e1eff" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
+            <Feather name="menu" size={25} color="#000" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
-const App = () => (
-  <View style={styles.container}>
-    <TopMenu />
-  </View>
-);
-
 const styles = StyleSheet.create({
-  topMenu: {
-    height: 90,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  safeArea: {
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f1f1',
+    top: 20
+  },
+  topMenu: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
+    height: Platform.OS === 'ios' ? 80 : 70,
+    borderBottomColor: '#f0f0f0',
+    borderBottomWidth: 1,
+    width: '100%',
+    backgroundColor: '#fff',
   },
   button: {
-    padding: 10,
-    marginTop: 19,
+    padding: 8,
   },
   title: {
-    fontSize: 17,
-    marginTop: 25,
-    fontWeight: '500',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    fontSize: width * 0.045,
     fontFamily: 'Manrope',
+    color: '#000',
   },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
+
+  rightIcons: {
+    flexDirection: 'row',
     alignItems: 'center',
+  },
+  iconButton: {
+    padding: 10,
+    marginLeft: 8,
   },
 });
 
-export default App;
+export default TopMenu;

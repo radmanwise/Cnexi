@@ -12,6 +12,7 @@ import ipconfig from '../config/ipconfig';
 
 
 const initialLayout = { width: Dimensions.get('window').width };
+
 const ForYouScreen = () => (
   <View style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }}>
     <PostScreen filter='forYou' />

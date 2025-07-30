@@ -41,7 +41,9 @@ const PostScreen = () => {
     isModalVisible: false
   });
 
-  
+
+
+
   const videoRefs = useRef([]);
   const navigation = useNavigation();
 
@@ -126,6 +128,9 @@ const PostScreen = () => {
     str?.length > maxLength ? `${str.substring(0, maxLength)}...` : str,
     []);
 
+
+
+
   const renderPostHeader = useCallback(({ item }) => (
     <View style={styles.header}>
       <View style={styles.profileStatus}>
@@ -177,7 +182,7 @@ const PostScreen = () => {
                   <TouchableWithoutFeedback onPress={() => handleVideoPress(index)}>
                     <Video
                       ref={ref => videoRefs.current[index] = ref}
-                      source={{ uri: file.file }}
+                      source={{ uri: file?.file ?? '' }}
                       style={styles.mediaContent}
                       resizeMode="contain"
                       isLooping
@@ -196,6 +201,7 @@ const PostScreen = () => {
                 )}
               </View>
             )}
+
           />
           <View style={styles.paginationDots}>
             {item.files.map((_, dotIndex) => (

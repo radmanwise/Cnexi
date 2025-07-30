@@ -2,9 +2,9 @@ import { View, StyleSheet, TouchableOpacity, Text, Image } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import AlarmIcon from '../components/icons/AlarmIcon';
-import SearchIcon2 from '../components/icons/SearchIcon2';
 import AddIcon from '../components/icons/AddIcon';
 import * as Font from 'expo-font';
+
 export default function HomeNavigationBar() {
     const navigation = useNavigation();
   
@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
         gap: 0,
     },
     iconButton: {
-        padding: 6,
-        marginLeft: 12,
+        padding: 15,
+        marginLeft: -5,
         borderRadius: 50,
         minWidth: 20,
         alignItems: 'center',

@@ -1,11 +1,10 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { View, StyleSheet, TouchableOpacity, Text, Button, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import React, { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { I18nManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import SearchIcon from '../components/icons/SearchIcon';
 import { ThemeProvider } from '../screens/settings/ThemeContext';
@@ -14,8 +13,7 @@ import HomeSolidIcon from '../components/icons/HomeSolidIcon';
 import UserIcon from '../components/icons/UserIcon';
 import SearchSolidIcon from '../components/icons/SearchSolidIcon';
 import UserSolidIcon from '../components/icons/UserSolidIcon';
-import * as Font from 'expo-font';
-
+import { Subtitle, Title } from '../components/ui/Typography';
 
 import {
   HomeScreen,
@@ -49,16 +47,15 @@ import {
   PostSaveScreen,
   FavoritesScreen,
   OtpRegisterScreen,
+  SplashScreen,
 }
   from '../screens';
-import SplashScreen from './SplashScreen';
+
 
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-I18nManager.allowRTL(false);
-I18nManager.forceRTL(false);
 
 const PostStack = () => {
   return (
@@ -165,11 +162,11 @@ const ReelsStack = () => {
           headerRight: () => (
             <View style={{ flexDirection: 'row', gap: 15, paddingRight: 10 }}>
               <TouchableOpacity style={styles.buttonSide} onPress={() => navigation.navigate('ExploreScreen')}>
-                <Text style={{ color: '#ffffffff', fontFamily: 'ManropeVBold', fontSize: 10 }}>Explore</Text>
+                <Title style={{ color: '#ffffffff', fontSize: 10 }}>Explore</Title>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.buttonSide} onPress={() => navigation.navigate('Live')}>
-                <Text style={{ color: '#ffffffff', fontFamily: 'ManropeVBold', fontSize: 10 }}>Lives</Text>
+                <Title style={{ color: '#ffffffff', fontSize: 10 }}>Lives</Title>
               </TouchableOpacity>
             </View>
           ),
@@ -350,20 +347,6 @@ export default function App() {
   const [showTabBar, setShowTabBar] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        'Manrope': require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
-        'ManropeVBold': require('../assets/fonts/Manrope/Manrope-Bold.ttf'),
-      });
-      setFontsLoaded(true);
-    }
-    loadFonts();
-  }, []);
-
-
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -454,15 +437,12 @@ const MainTabNavigator = () => {
 
   const ACTIVE_COLOR = '#000000ff';
   const INACTIVE_COLOR = '#888';
+
   const screenOptions = {
-    tabBarShowLabel: false,
+    tabBarShowLabel: true,
     headerShown: false,
     tabBarActiveTintColor: ACTIVE_COLOR,
     tabBarInactiveTintColor: INACTIVE_COLOR,
-    tabBarLabelStyle: {
-      fontFamily: 'Manrope',
-      fontSize: 9,
-    },
     tabBarStyle: {
       position: "absolute",
       bottom: 0,
@@ -476,22 +456,6 @@ const MainTabNavigator = () => {
   const CustomTabBarButton = (props) => (
     <TouchableOpacity activeOpacity={1} {...props} />
   );
-
-
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    Font.loadAsync({
-      ManropeRegular: require('../assets/fonts/Manrope/Manrope-Regular.ttf'),
-      ManropeBold: require('../assets/fonts/Manrope/Manrope-Bold.ttf'),
-      ManropeMedium: require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
-    }).then(() => setFontsLoaded(true));
-  }, []);
-
-  if (!fontsLoaded) {
-    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator size="large" /></View>;
-  }
-
 
   return (
     <Tab.Navigator screenOptions={screenOptions}>
@@ -513,32 +477,30 @@ const MainTabNavigator = () => {
             </View>
           ),
           tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontFamily: 'Manrope', fontSize: 9 }}>Home</Text>
+            <Subtitle style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontSize: 9 }}>Home</Subtitle>
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
       />
       <Tab.Screen
-        name="Like"
+        name="Explore"
         component={ReelsStack}
         options={{
           title: 'Explore',
           tabBarStyle: {
-            ...screenOptions.tabBarStyle,
-            display: isLoggedIn && showTabBar ? 'none' : 'none',
             backgroundColor: 'black',
           },
           tabBarIcon: ({ focused }) => (
-            <View>
-              {focused ? (
-                <SearchSolidIcon size={27} color={ACTIVE_COLOR} />
-              ) : (
-                <SearchIcon size={27} color={INACTIVE_COLOR} />
-              )}
-            </View>
+      <View>
+        {focused ? (
+          <SearchSolidIcon size={27} color="#ffffff" />  
+        ) : (
+          <SearchIcon size={27} color={INACTIVE_COLOR} />
+        )}
+      </View>
           ),
           tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontFamily: 'Manrope', fontSize: 9 }}>Explore</Text>
+            <Subtitle style={{ color: focused ? "#ffffff" : INACTIVE_COLOR, fontSize: 9 }}>Explore</Subtitle>
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
@@ -559,7 +521,7 @@ const MainTabNavigator = () => {
             </View>
           ),
           tabBarLabel: ({ focused }) => (
-            <Text style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontFamily: 'Manrope', fontSize: 9 }}>You</Text>
+            <Subtitle style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontSize: 9 }}>You</Subtitle>
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
@@ -568,17 +530,11 @@ const MainTabNavigator = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   animation: {
     width: '70%',
     height: '70%',
     padding: 15,
-  },
-  animationLike: {
-    width: '70%',
-    height: '70%',
-    padding: 17,
   },
   buttonSide: {
     backgroundColor: '#000000ff',

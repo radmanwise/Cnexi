@@ -12,6 +12,8 @@ import RegisterScreen from "./auth/RegisterScreen";
 import PasswordScreen from "./auth/PasswordScreen";
 import SubmitScreen from "./auth/SubmitScreen";
 import OtpRegisterScreen from "./auth/OtpRegisterScreen";
+import SplashScreen from './SplashScreen';
+
 // User & Profile Screens
 import EditProfile from "./EditProfile";
 import OtherUserProfileScreen from "./OtherUserProfileScreen";
@@ -53,7 +55,7 @@ export {
     PasswordScreen,
     SubmitScreen,
     OtpRegisterScreen,
-    
+    SplashScreen,
     // User & Profile
     EditProfile,
     OtherUserProfileScreen,

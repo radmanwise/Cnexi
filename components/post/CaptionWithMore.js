@@ -1,74 +1,47 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, Animated } from 'react-native';
 import { useFonts } from 'expo-font';
-
 
 const CaptionWithMore = ({ description }) => {
   const [showFullText, setShowFullText] = useState(false);
-  const [textHeight] = useState(new Animated.Value(0));
+  const [animation] = useState(new Animated.Value(0));
 
-  const [loaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     'Manrope': require('../../assets/fonts/Manrope/Manrope-Medium.ttf'),
   });
 
-
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        'Manrope': require('../../assets/fonts/Manrope/Manrope-Medium.ttf'),
-      });
-      setFontsLoaded(true);
-    }
-    loadFonts();
-  }, []);
-
-
-  const handleToggleText = useCallback(() => {
-    setShowFullText(prev => !prev);
-    Animated.spring(textHeight, {
-      toValue: showFullText ? 0 : 1,
+  const toggleText = useCallback(() => {
+    const toValue = showFullText ? 0 : 1;
+    setShowFullText(!showFullText);
+    Animated.timing(animation, {
+      toValue,
+      duration: 150,
       useNativeDriver: false,
-      bounciness: 0,
-      speed: 12,
     }).start();
-  }, [showFullText, textHeight]);
+  }, [showFullText, animation]);
 
-  if (!loaded || !description) {
-    return null;
-  }
+  if (!fontsLoaded || !description) return null;
+
+  const animatedStyle = {
+    maxHeight: animation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [45, 500],
+      extrapolate: 'clamp',
+    }),
+  };
 
   return (
-    <View style={styles.container}>
-      <Animated.Text
-        style={[
-          styles.caption,
-          {
-            maxHeight: textHeight.interpolate({
-              inputRange: [0, 1],
-              outputRange: [45, 500],
-              extrapolate: 'clamp'
-            })
-          }
-        ]}
-        numberOfLines={showFullText ? undefined : 2}
-        ellipsizeMode="tail"
-      >
-        {description}
-      </Animated.Text>
-      {description.length > 50 && (
-        <TouchableOpacity
-          onPress={handleToggleText}
-          style={styles.moreButton}
-          activeOpacity={0.7}
+    <TouchableWithoutFeedback onPress={toggleText}>
+      <View style={styles.container}>
+        <Animated.Text
+          style={[styles.caption, animatedStyle]}
+          numberOfLines={showFullText ? undefined : 1}
+          ellipsizeMode="tail"
         >
-          <Text style={styles.moreText}>
-            {showFullText ? 'less' : 'more'}
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
+          {description}
+        </Animated.Text>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -81,24 +54,12 @@ const styles = StyleSheet.create({
     left: -15,
   },
   caption: {
-    fontSize: 13.5,
+    fontSize: 12.9,
     lineHeight: 20,
     color: '#262626',
     letterSpacing: 0.3,
     textAlign: 'left',
     fontFamily: 'Manrope',
-  },
-  moreButton: {
-    alignSelf: 'flex-start',
-    marginTop: 2,
-    paddingVertical: 2,
-    paddingHorizontal: 4,
-  },
-  moreText: {
-    color: '#000',
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '500',
   },
 });
 

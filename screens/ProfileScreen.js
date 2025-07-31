@@ -6,6 +6,11 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
+import ipconfig from '../config/ipconfig';
+import { Animated } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Easing } from 'react-native-reanimated';
+import { Title, Subtitle } from '../components/ui/Typography'
 import {
   View,
   Text,
@@ -19,13 +24,6 @@ import {
   Dimensions,
   Modal
 } from 'react-native';
-import ipconfig from '../config/ipconfig';
-import * as Font from 'expo-font';
-import { Animated } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PanResponder } from 'react-native';
-import { Easing } from 'react-native-reanimated';
-
 
 const { width } = Dimensions.get('window');
 
@@ -33,20 +31,15 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFullBio, setShowFullBio] = useState(false);
   const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState('');
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const profileImageRef = useRef(null);
   const [imageLayout, setImageLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
-
-
   const [isModalVisible, setIsModalVisible] = useState(false);
-
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
@@ -119,21 +112,11 @@ export default function ProfileScreen() {
     setTimeout(() => setIsModalVisible(false), 100);
   };
 
-
-
   const MAX_BIO_LENGTH = 60;
 
   const truncateText = (text, length) =>
     text.length > length ? text.substring(0, length) + '...' : text;
 
-  const loadFonts = async () => {
-    await Font.loadAsync({
-      'Manrope': require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
-      'ManropeBold': require('../assets/fonts/Manrope/Manrope-Bold.ttf'),
-      'ManropeSemiBold': require('../assets/fonts/Manrope/Manrope-SemiBold.ttf'),
-    });
-    setFontsLoaded(true);
-  };
 
   const loadCachedProfile = async () => {
     const cached = await AsyncStorage.getItem('profileData');
@@ -173,7 +156,6 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
-    loadFonts();
     loadCachedProfile();
     fetchProfileData();
   }, []);
@@ -220,7 +202,7 @@ export default function ProfileScreen() {
                 { translateY: translateY },
                 { scale: scaleAnim },
               ],
-              borderRadius: 100, // اگر می‌خواهی گرد باشه
+              borderRadius: 100,
               overflow: 'hidden',
             }}
           >
@@ -261,15 +243,14 @@ export default function ProfileScreen() {
 
             </TouchableOpacity>
 
-
-            <Text style={styles.username}>{truncateText(profileData?.username_i || '', 12)}</Text>
+            <Title style={styles.username}>{truncateText(profileData?.username_i || '', 12)}</Title>
             <View style={styles.buttonStyle}>
               {isCurrentUser ? (
                 <TouchableOpacity
                   onPress={() => navigation.navigate('EditProfile', { username: profileData?.username_i })}
                   style={styles.editButton}
                 >
-                  <Text style={styles.editButtonText}>{t('Edit Profile')}</Text>
+                  <Subtitle style={styles.editButtonText}>{t('Edit Profile')}</Subtitle>
                 </TouchableOpacity>
               ) : (
                 <FollowButton userId={userId} initialIsFollowing={profileData?.is_following} />
@@ -295,25 +276,31 @@ export default function ProfileScreen() {
                 style={styles.profileInformation}
                 onPress={() => item.navigateTo && navigation.navigate(item.navigateTo, { userId })}
               >
-                <Text style={styles.count}>{item.value || 0}</Text>
-                <Text style={styles.label}>{item.label}</Text>
+                <Title style={styles.count}>{item.value || 0}</Title>
+                <Subtitle style={styles.label}>{item.label}</Subtitle>
               </TouchableOpacity>
             ))}
           </View>
 
           <View style={styles.bioContainer}>
-            <Text style={styles.biography}>
-              {showFullBio ? profileData?.bio : truncateText(profileData?.bio || '', MAX_BIO_LENGTH)}
-            </Text>
-            {(profileData?.bio?.length || 0) > MAX_BIO_LENGTH && (
-              <TouchableOpacity onPress={() => setShowFullBio(!showFullBio)} style={styles.seeMoreButton}>
-                <Text style={styles.seeMoreText}>{showFullBio ? 'See Less' : 'See More'}</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setShowFullBio(!showFullBio)}
+              style={styles.bioContainer}
+            >
+              <Subtitle style={styles.biography}>
+                {showFullBio ? profileData?.bio : truncateText(profileData?.bio || '', MAX_BIO_LENGTH)}
+              </Subtitle>
+              {!showFullBio && (profileData?.bio?.length || 0) > MAX_BIO_LENGTH && (
+                <Text style={styles.seeMoreText}></Text>
+              )}
+            </TouchableOpacity>
+
           </View>
         </View>
-
-        <PostList posts={profileData?.posts || []} />
+        <View style={{ bottom: 40 }}>
+          <PostList posts={profileData?.posts || []} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -348,7 +335,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     marginTop: '9%',
-    fontFamily: 'ManropeSemiBold'
+    fontFamily: 'ManropeSemiBold',
+    color: 'black'
   },
   buttonStyle: {
     marginTop: 20,
@@ -391,9 +379,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     padding: 5,
-    fontFamily: 'ManropeSemiBold'
+    fontFamily: 'ManropeSemiBold',
+    color: 'black',
   },
   bioContainer: {
+    bottom: 12,
     maxWidth: 360,
     padding: 16,
   },
@@ -401,6 +391,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Manrope',
     lineHeight: 18,
+    color: 'black'
   },
   seeMoreButton: {
     marginTop: 5,

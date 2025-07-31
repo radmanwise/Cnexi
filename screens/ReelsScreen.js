@@ -30,8 +30,8 @@ const ReelsScreen = () => {
     onRefresh,
   } = useReelsData();
 
-  const videoRefs = useRef({});  // برای نگهداری رفرنس ویدیوها
-  const flatListRef = useRef(null);  // رفرنس برای FlatList خود کامپوننت
+  const videoRefs = useRef({}); 
+  const flatListRef = useRef(null);  
 
   const [currentPlayingIndex, setCurrentPlayingIndex] = useState(null);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
@@ -206,13 +206,13 @@ const ReelsScreen = () => {
 
       <FlatList
         data={videos}
-        ref={flatListRef}  // رفرنس صحیح به FlatList
+        ref={flatListRef} 
         renderItem={({ item, index }) => (
           <VideoItem
             item={item}
             index={index}
             currentPlayingIndex={currentPlayingIndex}
-            videoRefs={videoRefs}  // رفرنس ویدیوها به VideoItem می‌رود
+            videoRefs={videoRefs} 
             handleVideoPress={handleVideoPress}
             likes={likes}
             onLike={handleLike}

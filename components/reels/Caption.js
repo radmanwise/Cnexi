@@ -14,14 +14,4 @@ const Caption = ({ description }) => {
   );
 };
 
-// const styles = StyleSheet.create({
-//   caption: {
-//     color: '#fff',
-//     fontSize: 13,
-//     lineHeight: 20,
-//     bottom: 10,
-//     fontFamily: 'Manrope',
-//   },
-// });
-
 export default Caption;

@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     Dimensions,
     Animated,
     Image,
 } from 'react-native';
-import * as Font from 'expo-font';
+import * as SecureStore from 'expo-secure-store';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,11 +18,7 @@ const SplashScreen = ({ navigation }) => {
     const pulseAnim = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
-
-
-        // Complex animation sequence
         const animationSequence = async () => {
-            // Step 1: Logo appears with fade and scale
             await new Promise(resolve => {
                 Animated.parallel([
                     Animated.timing(fadeAnim, {
@@ -40,7 +35,6 @@ const SplashScreen = ({ navigation }) => {
                 ]).start(resolve);
             });
 
-            // Step 2: Logo rotation
             await new Promise(resolve => {
                 Animated.timing(logoRotate, {
                     toValue: 1,
@@ -49,7 +43,6 @@ const SplashScreen = ({ navigation }) => {
                 }).start(resolve);
             });
 
-            // Step 3: Text slides up
             await new Promise(resolve => {
                 Animated.timing(textSlideUp, {
                     toValue: 0,
@@ -58,7 +51,6 @@ const SplashScreen = ({ navigation }) => {
                 }).start(resolve);
             });
 
-            // Step 4: Continuous pulse animation
             Animated.loop(
                 Animated.sequence([
                     Animated.timing(pulseAnim, {
@@ -75,31 +67,28 @@ const SplashScreen = ({ navigation }) => {
             ).start();
         };
 
+        const checkLoginStatus = async () => {
+            try {
+                const token = await SecureStore.getItemAsync('token');
+                if (token) {
+                    navigation.replace('MainApp');
+                } else {
+                    navigation.replace('LoginScreen');
+                }
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                navigation.replace('LoginScreen');
+            }
+        };
+
         animationSequence();
 
-        // Navigate to main app after 4 seconds
         const timer = setTimeout(() => {
-            navigation.replace('MainApp');
+            checkLoginStatus();
         }, 1000);
 
-        return () => {
-            clearTimeout(timer);
-        };
+        return () => clearTimeout(timer);
     }, [navigation]);
-
-
-    const [fontsLoaded, setFontsLoaded] = useState(false);
-
-    useEffect(() => {
-        async function loadFonts() {
-            await Font.loadAsync({
-                'Manrope': require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
-            });
-            setFontsLoaded(true);
-        }
-        loadFonts();
-    }, []);
-
 
     const logoRotation = logoRotate.interpolate({
         inputRange: [0, 1],
@@ -108,7 +97,6 @@ const SplashScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-
             <Animated.View
                 style={[
                     styles.logoContainer,
@@ -146,8 +134,6 @@ const SplashScreen = ({ navigation }) => {
                 ]}
             >
             </Animated.View>
-
-
         </View>
     );
 };
@@ -155,7 +141,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffff',
+        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -168,42 +154,8 @@ const styles = StyleSheet.create({
         width: 180,
         height: 180,
     },
-    logoVers: {
-        color: '#ffffff',
-    },
     textContainer: {
         alignItems: 'center',
-    },
-    appName: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: 'white',
-        marginBottom: 12,
-        letterSpacing: 3,
-    },
-    tagline: {
-        fontSize: 16,
-        color: '#cccccc',
-        textAlign: 'center',
-        letterSpacing: 1,
-    },
-    footer: {
-        position: 'absolute',
-        bottom: 80,
-        alignItems: 'center',
-    },
-
-    loadingContainer: {
-        flexDirection: 'row',
-        position: 'absolute',
-        bottom: 120,
-    },
-    dot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#4a90e2',
-        marginHorizontal: 4,
     },
 });
 

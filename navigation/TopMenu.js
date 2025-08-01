@@ -88,14 +88,14 @@ const TopMenu = () => {
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: '#fff',
-    top: 20
+    top: 15
   },
   topMenu: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    height: Platform.OS === 'ios' ? 80 : 70,
+    height: 70,
     borderBottomColor: '#f0f0f0',
     borderBottomWidth: 1,
     width: '100%',

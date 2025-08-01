@@ -1,20 +1,39 @@
 import React, { useRef, useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ImageBackground,
   Animated,
-  Image,
-  SafeAreaView,
   Alert,
+  Dimensions,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
-import { Video } from 'expo-av';
 import { Title, Subtitle } from '../../components/ui/Typography';
+import PostTypeCard from './PostTypeCard';
+import MediaPreview from './MediaPreview';
+import LoadingScreen from './LoadingScreen';
+
+function MediaSourceSelector({ onSelect }) {
+  return (
+    <View style={styles.sourceSelectorContainer}>
+      <TouchableOpacity
+        style={[styles.sourceButton, styles.galleryButton]}
+        onPress={() => onSelect('gallery')}
+        activeOpacity={0.8}
+      >
+        <Title style={styles.sourceButtonText}>Choose from Gallery</Title>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.sourceButton, styles.cameraButton]}
+        onPress={() => onSelect('camera')}
+        activeOpacity={0.8}
+      >
+        <Title style={styles.sourceButtonText}>Take a Photo/Video</Title>
+      </TouchableOpacity>
+    </View>
+
+  );
+}
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
@@ -22,94 +41,121 @@ const SPACING = 20;
 const ITEM_SPACING = (width - CARD_WIDTH) / 2;
 
 const POST_TYPES = [
-  { key: 'photo', label: 'Photo', mediaType: ImagePicker.MediaTypeOptions.Images },
-  { key: 'video', label: 'Video', mediaType: ImagePicker.MediaTypeOptions.Videos },
-  { key: 'reels', label: 'Reels', mediaType: ImagePicker.MediaTypeOptions.Videos },
-  { key: 'story', label: 'Story', mediaType: ImagePicker.MediaTypeOptions.Images },
+  {
+    key: 'photo',
+    label: 'Photo',
+    mediaType: ImagePicker.MediaTypeOptions.Images,
+    image: require('../../assets/img/static/ImageCover.webp'),
+    icon: 'image-outline',
+  },
+  {
+    key: 'reels',
+    label: 'Reels',
+    mediaType: ImagePicker.MediaTypeOptions.Videos,
+    image: require('../../assets/img/static/ImageCover.webp'),
+    icon: 'film-outline',
+  },
+  {
+    key: 'story',
+    label: 'Story',
+    mediaType: ImagePicker.MediaTypeOptions.Images,
+    image: require('../../assets/img/static/ImageCoverStory.jpeg'),
+    icon: 'time-outline',
+    disabled: true,
+  },
 ];
+
+import { TouchableOpacity } from 'react-native';
 
 export default function AddPostScreen({ navigation }) {
   const scrollX = useRef(new Animated.Value(0)).current;
   const [selectedType, setSelectedType] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [waitingForSource, setWaitingForSource] = useState(false);
 
-  const pickMedia = async (type) => {
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Camera permission is required to take photos or videos');
+      return false;
+    }
+    return true;
+  };
+
+  const pickMedia = async (type, fromCamera = false) => {
     try {
       const typeObj = POST_TYPES.find(t => t.key === type);
       if (!typeObj) return;
 
       const options = {
         mediaTypes: typeObj.mediaType,
-        allowsEditing: true,
-        aspect: type === 'reels' ? [9, 16] : [4, 3],
+        allowsEditing: false,
         quality: 1,
         videoMaxDuration: type === 'reels' ? 30 : 60,
       };
 
-      const result = await ImagePicker.launchImageLibraryAsync(options);
+
+      let result;
+      if (fromCamera) {
+        const hasPermission = await requestCameraPermission();
+        if (!hasPermission) return;
+        result = await ImagePicker.launchCameraAsync(options);
+      } else {
+        result = await ImagePicker.launchImageLibraryAsync(options);
+      }
+
       if (!result.canceled) {
         setUploading(true);
         setSelectedMedia(result.assets[0]);
         setSelectedType(type);
         setUploading(false);
+        setWaitingForSource(false);
       }
     } catch (e) {
       Alert.alert('Error', 'Failed to pick media');
       setUploading(false);
+      setWaitingForSource(false);
     }
   };
 
-  if (uploading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Processing...</Text>
-      </View>
-    );
-  }
+  const onSelectPostType = (type) => {
+    setSelectedType(type);
+    setWaitingForSource(true);
+  };
+
+  const onSelectSource = (source) => {
+    if (!selectedType) return;
+
+    if (source === 'camera') {
+      pickMedia(selectedType, true);
+    } else {
+      pickMedia(selectedType, false);
+    }
+  };
+
+  if (uploading) return <LoadingScreen />;
 
   if (selectedMedia) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.previewHeader}>
-          <TouchableOpacity onPress={() => setSelectedMedia(null)}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.previewTitle}>{selectedType === 'reels' ? 'New Reel' : 'New Post'}</Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('CaptionScreen', {
-                media: selectedMedia,
-                mediaType: selectedMedia.type === 'video' ? 'video' : 'photo',
-                postType: selectedType,
-              });
-            }}
-          >
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
-
-        {selectedMedia.type === 'video' ? (
-          <Video
-            source={{ uri: selectedMedia.uri }}
-            style={styles.previewMedia}
-            resizeMode="cover"
-            shouldPlay
-            isLooping
-            isMuted
-          />
-        ) : (
-          <Image
-            source={{ uri: selectedMedia.uri }}
-            style={styles.previewMedia}
-            resizeMode="cover"
-          />
-        )}
-      </SafeAreaView>
+      <MediaPreview
+        media={selectedMedia}
+        onBack={() => setSelectedMedia(null)}
+        onNext={() =>
+          navigation.navigate('CaptionScreen', {
+            media: selectedMedia,
+            mediaType: selectedMedia.type === 'video' ? 'video' : 'photo',
+            postType: selectedType,
+          })
+        }
+      />
     );
   }
 
-  // صفحه انتخاب نوع پست
+  if (waitingForSource) {
+    return <MediaSourceSelector onSelect={onSelectSource} />;
+  }
+
   return (
     <View style={styles.container}>
       <Title style={styles.title}>Create Something Awesome</Title>
@@ -146,30 +192,12 @@ export default function AddPostScreen({ navigation }) {
           });
 
           return (
-            <Animated.View
-              style={{
-                width: CARD_WIDTH,
-                marginRight: SPACING,
-                transform: [{ scale }],
-                opacity,
-              }}
-            >
-              <TouchableOpacity
-                activeOpacity={0.9}
-                style={styles.card}
-                onPress={() => pickMedia(item.key)}
-              >
-                <ImageBackground
-                  source={require('../../assets/img/static/ImageCover.webp')}
-                  style={styles.card}
-                  imageStyle={{ borderRadius: 24 }}
-                >
-                  <View style={styles.cardOverlay}>
-                    <Title style={styles.cardLabel}>{item.label}</Title>
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            </Animated.View>
+            <PostTypeCard
+              item={item}
+              onPress={onSelectPostType}
+              scale={scale}
+              opacity={opacity}
+            />
           );
         }}
       />
@@ -178,36 +206,39 @@ export default function AddPostScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
-  title: { fontSize: 30, color: '#008CFF', marginLeft: 20, marginBottom: 6, width: '100%' },
+  container: { flex: 1, backgroundColor: '#fff', paddingTop: 20 },
+  title: { fontSize: 30, color: '#008CFF', marginLeft: 20, marginBottom: 15, width: '100%' },
   subtitle: { fontSize: 14, color: '#444', marginLeft: 20, marginBottom: 26 },
-  card: {
-    height: 500,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#ccc',
-  },
-  cardOverlay: {
+
+  sourceSelectorContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'flex-end',
-    padding: 16,
-  },
-  cardLabel: {
-    color: '#fff',
-    fontSize: 22,
-  },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { fontSize: 16, color: '#000' },
-  previewHeader: {
+    justifyContent: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 15,
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    marginTop: 40,
+    paddingHorizontal: 20,
+    gap: 20,
   },
-  previewTitle: { fontSize: 18, fontWeight: '600', color: '#000' },
-  nextButtonText: { color: '#0095f6', fontWeight: '600' },
-  previewMedia: { width, height: '80%', borderRadius: 10, alignSelf: 'center' },
+  sourceButton: {
+    flex: 1,
+    marginHorizontal: 10,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  galleryButton: {
+    backgroundColor: '#7d7d7dff',
+    height: 20,
+  },
+  cameraButton: {
+    backgroundColor: '#7d7d7dff',
+    height: 20,
+  },
+  sourceButtonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
 });

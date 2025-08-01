@@ -259,7 +259,7 @@ const SettingsScreen = () => {
         ))}
 
         <View style={styles.versionContainer}>
-          <Subtitle style={styles.versionText}>Version 1.1.3</Subtitle>
+          <Subtitle style={styles.versionText}>Version 0.1.5</Subtitle>
         </View>
       </ScrollView>
     </View>

@@ -298,7 +298,7 @@ export default function ProfileScreen() {
 
           </View>
         </View>
-        <View style={{ bottom: 40 }}>
+        <View style={{ bottom: 75 }}>
           <PostList posts={profileData?.posts || []} />
         </View>
       </ScrollView>
@@ -313,13 +313,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   profileCard: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#ffffffff',
     width: '92%',
     marginTop: 24,
     borderRadius: 50,
     padding: 1,
-    borderBottomRightRadius: 25,
-    borderTopRightRadius: 25,
+    borderBottomRightRadius: 20,
+    borderTopRightRadius: 20,
     shadowColor: 'black',
   },
   profileImage: {
@@ -339,8 +339,7 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   buttonStyle: {
-    marginTop: 20,
-    position: 'absolute',
+    bottom: 60,
     marginLeft: '60%',
     borderRadius: 13,
     padding: 0,
@@ -348,10 +347,10 @@ const styles = StyleSheet.create({
   editButton: {
     borderRadius: 10,
     borderColor: 'black',
-    borderWidth: 1.5,
+    borderWidth: 0,
     padding: 8,
     width: 130,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#e9e9e9ff',
   },
   editButtonText: {
     fontWeight: '600',
@@ -368,6 +367,7 @@ const styles = StyleSheet.create({
   },
   profileInformation: {
     alignItems: 'center',
+    bottom: 35,
   },
   label: {
     fontSize: 13,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   bioContainer: {
-    bottom: 12,
+    bottom: 32,
     maxWidth: 360,
     padding: 16,
   },

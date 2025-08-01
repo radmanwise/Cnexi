@@ -20,7 +20,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-
+import { Title, Subtitle } from '../../components/ui/Typography'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -58,14 +58,14 @@ const SettingItem = ({ icon: Icon, iconName, title, onPress, delay, subtitle, ba
           <Icon name={iconName} size={22} color={getIconColor(iconName)} />
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.settingText}>{title}</Text>
-          {subtitle && <Text style={styles.settingSubtext}>{subtitle}</Text>}
+          <Title style={styles.settingText}>{title}</Title>
+          {subtitle && <Subtitle style={styles.settingSubtext}>{subtitle}</Subtitle>}
         </View>
       </View>
       <View style={styles.rightContainer}>
         {badgeCount > 0 && (
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{badgeCount}</Text>
+            <Subtitle style={styles.badgeText}>{badgeCount}</Subtitle>
           </View>
         )}
         <View style={styles.arrowContainer}>
@@ -78,7 +78,7 @@ const SettingItem = ({ icon: Icon, iconName, title, onPress, delay, subtitle, ba
 
 const SettingsSection = ({ title, children }) => (
   <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
+    <Title style={styles.sectionTitle}>{title}</Title>
     <View style={styles.sectionContent}>
       {children}
     </View>
@@ -259,8 +259,7 @@ const SettingsScreen = () => {
         ))}
 
         <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>Version 1.0.0</Text>
-          <Text style={styles.dateText}>{currentDate}</Text>
+          <Subtitle style={styles.versionText}>Version 1.1.3</Subtitle>
         </View>
       </ScrollView>
     </View>
@@ -269,36 +268,36 @@ const SettingsScreen = () => {
 
 const getIconBackground = (iconName) => {
   const colors = {
-    sun: '#FFF8E1',
-    'block-flipped': '#FFE5E5',
-    'account-circle-outline': '#E8F5E9',
-    'language-sharp': '#E3F2FD',
-    star: '#FFF3E0',
-    'pie-chart': '#F3E5F5',
-    exclamationcircleo: '#E1F5FE',
-    'bug-report': '#FFEBEE',
-    security: '#EDE7F6',
-    bell: '#FFF3E0',
-    'data-usage': '#E0F2F1',
-    'log-out': '#FFEBEE',
+    sun: '#ffffffff',
+    'block-flipped': '#ffffffff',
+    'account-circle-outline': '#ffffffff',
+    'language-sharp': '#ffffffff',
+    star: '#ffffffff',
+    'pie-chart': '#ffffffff',
+    exclamationcircleo: '#ffffffff',
+    'bug-report': '#ffffffff',
+    security: '#ffffffff',
+    bell: '#ffffffff',
+    'data-usage': '#ffffffff',
+    'log-out': '#ffffffff',
   };
-  return colors[iconName] || '#F5F5F5';
+  return colors[iconName] || '#ffffffff';
 };
 
 const getIconColor = (iconName) => {
   const colors = {
-    sun: '#FFB300',
-    'block-flipped': '#F44336',
-    'account-circle-outline': '#43A047',
-    'language-sharp': '#1E88E5',
-    star: '#FF9800',
-    'pie-chart': '#9C27B0',
-    exclamationcircleo: '#03A9F4',
-    'bug-report': '#E53935',
-    security: '#5E35B1',
-    bell: '#FF9800',
-    'data-usage': '#00897B',
-    'log-out': '#D32F2F',
+    sun: '#3a3a3aff',
+    'block-flipped': '#3a3a3aff',
+    'account-circle-outline': '#3a3a3aff',
+    'language-sharp': '#3a3a3aff',
+    star: '#3a3a3aff',
+    'pie-chart': '#3a3a3aff',
+    exclamationcircleo: '#3a3a3aff',
+    'bug-report': '#3a3a3aff',
+    security: '#3a3a3aff',
+    bell: '#3a3a3aff',
+    'data-usage': '#3a3a3aff',
+    'log-out': '#3a3a3aff',
   };
   return colors[iconName] || '#757575';
 };
@@ -306,12 +305,11 @@ const getIconColor = (iconName) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#efefefff',
   },
   header: {
     padding: 16,
     paddingTop: Platform.OS === 'ios' ? 50 : 16,
-    backgroundColor: '#FAFAFA',
     top: 33
   },
   headerTitle: {
@@ -319,28 +317,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.5,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif-medium',
-        includeFontPadding: false,
-      },
-    }),
   },
   headerSubtitle: {
     fontSize: 14,
     color: '#666',
     marginTop: 4,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-      },
-    }),
   },
   scrollView: {
     flex: 1,
@@ -357,41 +338,20 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 12,
     paddingHorizontal: 16,
-    textTransform: 'uppercase',
     letterSpacing: 0.8,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif-medium',
-        includeFontPadding: false,
-      },
-    }),
   },
   sectionContent: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     marginHorizontal: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    backgroundColor: '#ffffffff',
+    elevation: 0,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    padding: 10,
+    borderBottomWidth: 0,
   },
   settingContent: {
     flexDirection: 'row',
@@ -410,32 +370,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingText: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    fontWeight: '500',
-    letterSpacing: -0.2,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-        includeFontPadding: false,
-      },
-    }),
+    fontSize: 14,
+    color: '#666666ff',
   },
   settingSubtext: {
     fontSize: 13,
     color: '#666',
     marginTop: 2,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-      },
-    }),
   },
   rightContainer: {
     flexDirection: 'row',
@@ -471,27 +412,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     letterSpacing: 0.2,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-      },
-    }),
   },
   dateText: {
     fontSize: 11,
     color: '#999',
     marginTop: 4,
-    ...Platform.select({
-      ios: {
-        fontFamily: 'System',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-      },
-    }),
   },
 });
 

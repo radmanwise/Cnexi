@@ -118,7 +118,7 @@ const SplashScreen = ({ navigation }) => {
                     ]}
                 >
                     <Image
-                        source={require('../assets/img/app/cnexi.png')}
+                        source={require('../assets/img/app/CnexiBlue.png')}
                         style={styles.image}
                     />
                 </Animated.View>

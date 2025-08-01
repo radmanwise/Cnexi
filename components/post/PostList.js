@@ -16,7 +16,10 @@ import ReelIcon from '../../components/icons/reelIcon';
 import ImageIcon from '../../components/icons/ImageIcon';
 import ImageOffIcon from '../../components/icons/ImageOffIcon';
 import FastImage from 'expo-fast-image';
-import { Title, Subtitle } from '../../components/ui/Typography'
+import { Title, Subtitle } from '../../components/ui/Typography';
+import AllIcon from '../../components/icons/AllIcon';
+import MusicIcon from '../../components/icons/MusicIcon';
+import ReelsIcon from '../../components/icons/ReelsIcon';
 
 const screenWidth = Dimensions.get('window').width;
 const itemSize = screenWidth / 3;
@@ -77,10 +80,11 @@ const Post = React.memo(({ post }) => {
 const PostList = ({ posts, fetchPosts }) => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'all', title: 'Posts' },
-    { key: 'reels', title: 'Reels' },
-    { key: 'music', title: 'Music' },
+    { key: 'all', title: 'Posts', icon: <AllIcon size={25} color="gray" /> },
+    { key: 'reels', title: 'Reels', icon: <ReelsIcon size={25} color="gray" /> },
+    { key: 'music', title: 'Music', icon: <MusicIcon size={25} color="gray" /> },
   ]);
+
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -155,6 +159,10 @@ const PostList = ({ posts, fetchPosts }) => {
     <View style={styles.tabBar}>
       {routes.map((route, i) => {
         const focused = index === i;
+        const icon = React.cloneElement(route.icon, {
+          color: focused ? '#282829ff' : '#a3a3a3ff',
+        });
+
         return (
           <TouchableOpacity
             key={route.key}
@@ -162,15 +170,14 @@ const PostList = ({ posts, fetchPosts }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.7}
           >
-            <Title style={[styles.tabText, focused ? styles.tabTextFocused : null]}>
-              {route.title}
-            </Title>
+            {icon}
             {focused && <View style={styles.indicator} />}
           </TouchableOpacity>
         );
       })}
     </View>
   );
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -230,7 +237,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#eeeeeece',
     borderBottomWidth: 1,
     justifyContent: 'space-around',
     paddingHorizontal: 10,
@@ -244,14 +251,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   tabTextFocused: {
-    color: '#008CFF',
+    color: '#202020ff',
     fontSize: 14,
   },
   indicator: {
-    marginTop: 5,
-    height: 3,
+    marginTop: 13,
+    height: 2,
     width: '95%',
-    backgroundColor: '#008CFF',
+    backgroundColor: '#1c1c1cff',
     borderRadius: 15,
   },
 });

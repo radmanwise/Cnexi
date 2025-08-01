@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import ipconfig from '../config/ipconfig';
+import ipconfig from '../../config/ipconfig';
 import * as SecureStore from 'expo-secure-store';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Location from 'expo-location';

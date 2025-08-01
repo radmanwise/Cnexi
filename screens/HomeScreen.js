@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-nati
 import { TabView, SceneMap } from 'react-native-tab-view';
 import HomeNavigationBar from '../navigation/HomeNavigationBar';
 import PostScreen from '../components/post/PostScreen';
+import { StatusBar } from 'react-native';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
@@ -50,6 +51,11 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <StatusBar
+        barStyle="dark-content" 
+        backgroundColor="transparent" 
+        translucent
+      />
       <HomeNavigationBar />
       <TabView
         navigationState={{ index, routes }}

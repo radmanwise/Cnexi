@@ -1,10 +1,10 @@
 import HomeScreen from "./HomeScreen";
 import ExploreScreen from "./ExploreScreen";
 import ProfileScreen from "./ProfileScreen";
-import AddPostScreen from "./AddPostScreen";
+import AddPostScreen from "./upload/AddPostScreen";
 import ReelsScreen from "./ReelsScreen";
 import PostDetailScreen from "./PostDetailScreen";
-import CaptionScreen from "./CaptionScreen";
+import CaptionScreen from "./upload/CaptionScreen";
 
 // Authentication Screens
 import LoginScreen from "./auth/LoginScreen";

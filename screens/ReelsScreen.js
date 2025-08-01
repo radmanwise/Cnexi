@@ -54,34 +54,32 @@ const ReelsScreen = () => {
     loadFonts();
   }, []);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const setupNavigationBar = async () => {
-  //       // غیر فعال کردن edge-to-edge
-  //       await NavigationBar.setPositionAsync('relative');
-  //       // رنگ مشکی مثل YouTube
-  //       await NavigationBar.setBackgroundColorAsync('#000000');
-  //       StatusBar.setBarStyle('light-content');
-  //       StatusBar.setBackgroundColor('black');
-  //     };
+  useFocusEffect(
+    useCallback(() => {
+      const setupNavigationBar = async () => {
+        await NavigationBar.setPositionAsync('relative');
+        await NavigationBar.setBackgroundColorAsync('#000000');
+        StatusBar.setBarStyle('light-content');
+        StatusBar.setBackgroundColor('black');
+      };
 
-  //     setupNavigationBar();
+      setupNavigationBar();
 
-  //     return () => {
-  //       const resetNavigationBar = async () => {
-  //         await NavigationBar.setPositionAsync('relative');
-  //         await NavigationBar.setBackgroundColorAsync('#ffffff');
-  //         StatusBar.setBarStyle('dark-content');
-  //         StatusBar.setBackgroundColor('white');
+      return () => {
+        const resetNavigationBar = async () => {
+          await NavigationBar.setPositionAsync('relative');
+          await NavigationBar.setBackgroundColorAsync('#ffffff');
+          StatusBar.setBarStyle('dark-content');
+          StatusBar.setBackgroundColor('white');
+          Object.values(videoRefs.current).forEach(video => {
+            if (video) video.pauseAsync();
+          });
+        };
+        resetNavigationBar();
+      };
+    }, [])
+  );
 
-  //         Object.values(videoRefs.current).forEach(video => {
-  //           if (video) video.pauseAsync();
-  //         });
-  //       };
-  //       resetNavigationBar();
-  //     };
-  //   }, [])
-  // );
   const handleVideoPress = useCallback(async (index) => {
     if (currentPlayingIndex === index) {
       if (videoRefs.current[index]) {

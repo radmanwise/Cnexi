@@ -11,6 +11,7 @@ import UserIcon from '../components/icons/UserIcon';
 import SearchSolidIcon from '../components/icons/SearchSolidIcon';
 import UserSolidIcon from '../components/icons/UserSolidIcon';
 import { Subtitle, Title } from '../components/ui/Typography';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import {
   HomeScreen,
   ExploreScreen,
@@ -85,7 +86,21 @@ const ProfileStack = () => {
         headerShown: false
       })} />
 
-      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} options={({ navigation }) => ({
+        title: '',
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#efefefff',
+        },
+
+        headerTitle: () => (
+          <Title style={{ color: 'black', fontSize: 20, top: -2 }}>
+            Settings
+          </Title>
+        ),
+
+      })} />
       <Stack.Screen name="ChangeThem" component={ChangeThem} options={{ headerShown: false }} />
       <Stack.Screen name="LanguageSwitcher" component={LanguageSwitcher} options={{ headerShown: false }} />
       <Stack.Screen name="Security" component={Security} options={{ headerShown: false }} />
@@ -196,10 +211,42 @@ const HomeStack = () => {
       }}
     >
       <Stack.Screen name="home" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="AddPostScreen" component={AddPostScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AddPostScreen" component={AddPostScreen} options={({ navigation }) => ({
+        title: '',
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#ffffffff',
+        },
+
+        headerTitle: () => (
+          <Title style={{ color: 'black', fontSize: 20, top: -2 }}>
+            New Post
+          </Title>
+        ),
+
+      })} />
       <Stack.Screen options={{ title: 'caption screen', headerShown: false, tabBarStyle: { display: 'none' }, }} name="CaptionScreen" component={CaptionScreen} />
       <Stack.Screen options={{ title: 'Search User', headerShown: false }} name="SearchUserScreen" component={SearchUserScreen} />
-      <Stack.Screen options={{ title: 'Notifications', }} name="NotificationsScreen" component={NotificationsScreen} />
+      <Stack.Screen
+        name="NotificationsScreen"
+        component={NotificationsScreen}
+        options={({ navigation }) => ({
+          title: '',
+          headerStyle: {
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+
+          headerTitle: () => (
+            <Title style={{ color: 'black', fontSize: 20, top: -2 }}>
+              Notifications
+            </Title>
+          ),
+
+        })}
+      />
+
       <Stack.Screen options={{ title: 'Following', headerShown: true }} name="FollowingScreen" component={FollowingScreen} />
       <Stack.Screen options={{ title: 'Posts', headerShown: false }} name="PostDetailScreen" component={PostDetailScreen} />
       <Stack.Screen options={{ title: 'Followers', headerShown: true }} name="FollowersScreen" component={FollowersScreen} />
@@ -286,6 +333,48 @@ export default function App() {
 }
 
 const MainTabNavigator = () => {
+  const getTabBarStyle = (route, defaultStyle) => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? '';
+    const hiddenRoutes = [
+      'OtherUserProfile',
+      'Settings',
+      'FollowersScreen',
+      'FollowingScreen',
+      'PostDetailScreen',
+      'EditProfile',
+      'Account',
+      'AccountStatus',
+      'SearchUserScreen',
+      'AddPostScreen',
+      'CaptionScreen',
+      'ChangeThem',
+      'LanguageSwitcher',
+      'Security',
+      'ReportBug',
+      'DataUsage',
+      'About',
+      'LoginSreen',
+      'NotificationsScreen',
+    ];
+
+    if (hiddenRoutes.includes(routeName)) {
+      return { display: 'none' };
+    }
+
+    if (routeName === 'Explore') {
+      return {
+        backgroundColor: 'black',
+        borderTopWidth: 0,
+        elevation: 0,
+        shadowColor: 'transparent',
+      };
+    }
+
+    return defaultStyle;
+  };
+
+
+
   const ACTIVE_COLOR = '#000000ff';
   const INACTIVE_COLOR = '#888';
   const screenOptions = {
@@ -302,16 +391,9 @@ const MainTabNavigator = () => {
       <Tab.Screen
         name="HomeTab"
         component={HomeStack}
-        options={{
+        options={({ route }) => ({
           title: 'Home',
-          tabBarStyle: {
-            display: 'flex',
-            backgroundColor: '#ffffff',
-            elevation: 0,
-            shadowColor: 'transparent',
-            borderTopWidth: 0.2,
-            paddingVertical: 8,
-          },
+          tabBarStyle: getTabBarStyle(route),
           tabBarIcon: ({ focused }) => (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               {focused ? (
@@ -325,16 +407,20 @@ const MainTabNavigator = () => {
             <Subtitle style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontSize: 9 }}>Home</Subtitle>
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
-        }}
+        })}
       />
       <Tab.Screen
         name="Explore"
         component={ReelsStack}
-        options={{
+        options={({ route }) => ({
           title: 'Explore',
-          tabBarStyle: {
-            backgroundColor: 'black',
-          },
+          tabBarStyle: getTabBarStyle(route, {
+            backgroundColor: '#000000ff',
+            elevation: 0,
+            shadowColor: 'transparent',
+            borderTopWidth: 0.2,
+            paddingVertical: 8,
+          }),
           tabBarIcon: ({ focused }) => (
             <View>
               {focused ? (
@@ -348,21 +434,14 @@ const MainTabNavigator = () => {
             <Subtitle style={{ color: focused ? "#ffffff" : INACTIVE_COLOR, fontSize: 9 }}>Explore</Subtitle>
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
-        }}
+        })}
       />
       <Tab.Screen
         name="ProfileStack"
         component={ProfileStack}
-        options={{
+        options={({ route }) => ({
           title: 'You',
-          tabBarStyle: {
-            display: 'flex',
-            backgroundColor: '#ffffff',
-            elevation: 0,
-            shadowColor: 'transparent',
-            borderTopWidth: 0.2,
-            paddingVertical: 8,
-          },
+          tabBarStyle: getTabBarStyle(route),
           tabBarIcon: ({ focused }) => (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
               {focused ? (
@@ -376,8 +455,9 @@ const MainTabNavigator = () => {
             <Subtitle style={{ color: focused ? ACTIVE_COLOR : INACTIVE_COLOR, fontSize: 9 }}>You</Subtitle>
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
-        }}
+        })}
       />
+
     </Tab.Navigator>
   );
 };

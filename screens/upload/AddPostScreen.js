@@ -20,7 +20,7 @@ function MediaSourceSelector({ onSelect }) {
         onPress={() => onSelect('gallery')}
         activeOpacity={0.8}
       >
-        <Title style={styles.sourceButtonText}>Choose from Gallery</Title>
+        <Title style={styles.sourceButtonText}>Gallery</Title>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -28,10 +28,9 @@ function MediaSourceSelector({ onSelect }) {
         onPress={() => onSelect('camera')}
         activeOpacity={0.8}
       >
-        <Title style={styles.sourceButtonText}>Take a Photo/Video</Title>
+        <Title style={styles.sourceButtonText}>Camera</Title>
       </TouchableOpacity>
     </View>
-
   );
 }
 
@@ -211,7 +210,6 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: '#444', marginLeft: 20, marginBottom: 26 },
 
   sourceSelectorContainer: {
-    flex: 1,
     justifyContent: 'center',
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -220,25 +218,19 @@ const styles = StyleSheet.create({
   sourceButton: {
     flex: 1,
     marginHorizontal: 10,
-    paddingVertical: 16,
+    paddingVertical: 20,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    elevation: 6,
+    top: 300
   },
   galleryButton: {
-    backgroundColor: '#7d7d7dff',
-    height: 20,
+    backgroundColor: '#efefefff',
   },
   cameraButton: {
-    backgroundColor: '#7d7d7dff',
-    height: 20,
+    backgroundColor: '#efefefff',
   },
   sourceButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 18,
   },
 });

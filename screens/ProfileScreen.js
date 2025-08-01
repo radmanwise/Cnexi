@@ -62,19 +62,19 @@ export default function ProfileScreen() {
       Animated.parallel([
         Animated.timing(scaleAnim, {
           toValue: 3,
-          duration: 200,
+          duration: 100,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(translateX, {
           toValue: moveX,
-          duration: 200,
+          duration: 150,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: moveY,
-          duration: 200,
+          duration: 150,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
@@ -90,7 +90,7 @@ export default function ProfileScreen() {
     Animated.parallel([
       Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 150,
+        duration: 100,
         easing: Easing.in(Easing.ease),
         useNativeDriver: true,
       }),
@@ -245,7 +245,7 @@ export default function ProfileScreen() {
 
             <Title style={styles.username}>{truncateText(profileData?.username_i || '', 12)}</Title>
             <View style={styles.buttonStyle}>
-              {isCurrentUser ? (
+              {/* {isCurrentUser ? (
                 <TouchableOpacity
                   onPress={() => navigation.navigate('EditProfile', { username: profileData?.username_i })}
                   style={styles.editButton}
@@ -254,7 +254,13 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               ) : (
                 <FollowButton userId={userId} initialIsFollowing={profileData?.is_following} />
-              )}
+              )} */}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('EditProfile', { username: profileData?.username_i })}
+                style={styles.editButton}
+              >
+                <Subtitle style={styles.editButtonText}>{t('Edit Profile')}</Subtitle>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -298,7 +304,7 @@ export default function ProfileScreen() {
 
           </View>
         </View>
-        <View style={{ bottom: 75 }}>
+        <View style={{ bottom: 70 }}>
           <PostList posts={profileData?.posts || []} />
         </View>
       </ScrollView>
@@ -383,15 +389,17 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   bioContainer: {
-    bottom: 32,
+    bottom: 25,
     maxWidth: 360,
     padding: 16,
+    width: '100%',
+    left: -4
   },
   biography: {
     fontSize: 13,
     fontFamily: 'Manrope',
     lineHeight: 18,
-    color: 'black'
+    color: 'black',
   },
   seeMoreButton: {
     marginTop: 5,

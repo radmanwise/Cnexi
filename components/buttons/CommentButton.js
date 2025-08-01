@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, TextInput} from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, TextInput } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import * as SecureStore from 'expo-secure-store';
@@ -8,7 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDistanceToNow } from 'date-fns';
 import ipconfig from '../../config/ipconfig';
 import CommentIcon from '../../components/icons/CommentIcon';
-import { useFonts } from 'expo-font';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+
+import FastImage from 'expo-fast-image';
 import TelegramIcon from '../../components/icons/TelegramIcon';
 
 const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
@@ -23,6 +25,12 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
+
+  const truncateText = useMemo(() => (str, maxLength) =>
+    str?.length > maxLength ? `${str.substring(0, maxLength)}...` : str,
+    []);
+
+  const navigation = useNavigation();
 
   const getToken = async () => {
     try {
@@ -108,7 +116,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           const userId = payload.user_id;
-          
+
           if (userId) {
             const response = await axios.post(
               `${ipconfig.BASE_URL}/post/${postId}/comments/create/`,
@@ -143,7 +151,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
       }
     }
   };
-  
+
 
   const addReply = async (replyText, commentId) => {
     try {
@@ -155,7 +163,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           const userId = payload.user_id;
-          
+
           if (userId) {
             const response = await axios.post(
               `${ipconfig.BASE_URL}/post/comments/${commentId}/reply/`,
@@ -198,12 +206,20 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
       <View style={styles.commentContainer}>
         <View style={styles.commentHeader}>
           <View style={styles.userInfo}>
-            <Image
-              source={{ uri: `${item.profile_image}` }}
-              style={styles.profileImage}
-            />
-            <Text style={styles.username}>{item.username}</Text>
-            <Text style={styles.time}>{timeAgo}</Text>
+            <TouchableOpacity
+              style={styles.profileContainer}
+              onPress={() => {
+                navigation.navigate('OtherUserProfile', { slug: item.username });
+              }}
+            >
+
+              <FastImage
+                source={{ uri: item.profile_image }}
+                style={styles.profileImage}
+                cacheKey={`profile-${item.username}`}
+              />
+              <Text style={styles.username}>{truncateText(item.username || 'username', 12)}</Text>
+            </TouchableOpacity>
           </View>
           <TouchableOpacity>
             <MaterialCommunityIcons name="dots-horizontal" size={20} color="#666" />
@@ -483,7 +499,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderRadius: 24,
     padding: 14,
-    paddingRight: 45, 
+    paddingRight: 45,
     fontSize: 14,
     fontFamily: 'Inter',
     marginTop: 12,
@@ -590,7 +606,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontSize: 14,
     color: '#999',
-  }, 
+  },
   commentButton: {
     padding: 14,
   },

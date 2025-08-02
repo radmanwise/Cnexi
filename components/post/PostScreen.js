@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-
+import { Animated } from 'react-native';
 import FastImage from 'expo-fast-image';
 import CommentButton from '../buttons/CommentButton';
 import CaptionWithMore from './CaptionWithMore';
@@ -21,7 +21,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Animated
 } from 'react-native';
 
 
@@ -30,7 +29,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POST_HEIGHT = SCREEN_HEIGHT * 0.50;
 const PROFILE_IMAGE_SIZE = 30;
 
-const PostScreen = () => {
+const PostScreen = ({ filter, scrollY }) => {
+
   const [state, setState] = useState({
     posts: [],
     loading: true,
@@ -42,23 +42,8 @@ const PostScreen = () => {
   });
 
 
-
-
   const videoRefs = useRef([]);
   const navigation = useNavigation();
-
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        'Manrope': require('../../assets/fonts/Manrope/Manrope-Medium.ttf'),
-        'ManropeSemiBold': require('../../assets/fonts/Manrope/Manrope-SemiBold.ttf'),
-      });
-      setFontsLoaded(true);
-    }
-    loadFonts();
-  }, []);
 
   const fetchPosts = useCallback(async (pageToFetch = 1, shouldRefresh = false) => {
     try {
@@ -254,7 +239,6 @@ const PostScreen = () => {
       <View style={styles.actionsContainer}>
         <View style={styles.leftActions} onStartShouldSetResponder={() => true}>
           <LikeButton postId={item.id} initialLiked={item.is_liked} />
-          {/* <ShareButton postId={item.id} /> */}
           <View onStartShouldSetResponder={() => true}>
             <CommentButton postId={item.id} />
           </View>
@@ -297,13 +281,9 @@ const PostScreen = () => {
     }, [])
   );
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
 
   return (
-    <FlatList
+    <Animated.FlatList
       data={state.posts}
       keyExtractor={item => item.id.toString()}
       renderItem={renderItem}
@@ -322,8 +302,16 @@ const PostScreen = () => {
       removeClippedSubviews={true}
       showsVerticalScrollIndicator={false}
       scrollEnabled={!state.isModalVisible}
+      contentContainerStyle={{ paddingTop: 140 }}
+      onScroll={scrollY
+        ? Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )
+        : null}
     />
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -490,7 +478,5 @@ const styles = StyleSheet.create({
   },
 
 });
-
-
 
 export default PostScreen;

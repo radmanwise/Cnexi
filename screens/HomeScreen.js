@@ -1,98 +1,160 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { TabView, SceneMap } from 'react-native-tab-view';
+import React, { useState, useRef, memo } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  StatusBar,
+  Animated,
+  ScrollView,
+  SafeAreaView,
+  Platform,
+} from 'react-native';
+import { TabView } from 'react-native-tab-view';
 import HomeNavigationBar from '../navigation/HomeNavigationBar';
 import PostScreen from '../components/post/PostScreen';
-import { StatusBar } from 'react-native';
 
-const initialLayout = { width: Dimensions.get('window').width };
+const { width } = Dimensions.get('window');
+const NAVBAR_HEIGHT = 60;
+const TABBAR_HEIGHT = 48;
 
-const ForYouScreen = () => (
-  <View style={styles.scene}>
-    <PostScreen filter='forYou' />
-  </View>
-);
+const tabRoutes = [
+  { key: 'forYou', title: 'For you' },
+  { key: 'followers', title: 'Following' },
+  { key: 'news', title: 'News' },
+  { key: 'music', title: 'Music' },
+  { key: 'sports', title: 'Sports' },
+];
 
-const FollowersScreen = () => (
-  <View style={styles.scene}>
-    <PostScreen filter='followers' />
-  </View>
-);
+const MemoTabBar = memo(({ index, setIndex, routes }) => (
+  <ScrollView
+    horizontal
+    showsHorizontalScrollIndicator={false}
+    contentContainerStyle={styles.tabBarContainer}
+    style={styles.tabBar}
+  >
+    {routes.map((route, i) => {
+      const isFocused = index === i;
+      return (
+        <TouchableOpacity
+          key={route.key}
+          style={[styles.tabItem, isFocused && styles.tabItemActive]}
+          onPress={() => setIndex(i)}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.tabText, isFocused && styles.tabTextActive]}>
+            {route.title}
+          </Text>
+        </TouchableOpacity>
+      );
+    })}
+  </ScrollView>
+));
 
 export default function HomeScreen() {
+  const scrollY = useRef(new Animated.Value(0)).current;
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'forYou', title: 'For you' },
-    { key: 'followers', title: 'Following' },
-  ]);
+  const [routes] = useState(tabRoutes);
 
-  const renderScene = SceneMap({
-    forYou: ForYouScreen,
-    followers: FollowersScreen,
-  });
 
-  const renderTabBar = props => (
-    <View style={styles.tabBar}>
-      {props.navigationState.routes.map((route, i) => {
-        const isFocused = index === i;
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'forYou':
+        return <PostScreen filter="forYou" />;
+      case 'followers':
+        return <PostScreen filter="followers" />;
+      default:
         return (
-          <TouchableOpacity
-            style={styles.tabItem}
-            onPress={() => setIndex(i)}
-            key={route.key}
-          >
-            <Text style={{ color: isFocused ? '#000' : 'gray' }}>{route.title}</Text>
-            {isFocused && <View style={styles.indicator} />}
-          </TouchableOpacity>
+          <View style={styles.emptyTab}>
+            <Text style={{ color: '#aaa', fontSize: 16 }}>
+              No content for "{route.title}"
+            </Text>
+          </View>
         );
-      })}
-    </View>
-  );
+    }
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <StatusBar
-        barStyle="dark-content" 
-        backgroundColor="transparent" 
-        translucent
-      />
-      <HomeNavigationBar />
+    <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+
+      <View style={styles.header}>
+
+        <SafeAreaView>
+          <View style={styles.navbar}>
+            <HomeNavigationBar />
+          </View>
+          <MemoTabBar index={index} setIndex={setIndex} routes={routes} />
+        </SafeAreaView>
+      </View>
+
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={initialLayout}
-        renderTabBar={renderTabBar}
+        initialLayout={{ width }}
+        renderTabBar={() => null}
+        lazy
+        renderLazyPlaceholder={() => <View style={{ flex: 1, backgroundColor: '#fff' }} />}
+        style={{ flex: 1 }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scene: {
+  container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  header: {
+    position: 'absolute',
+    top: -28,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    zIndex: 10,
+    paddingTop: Platform.OS === 'android' ? 40 : 0,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+  },
+  navbar: {
+    height: NAVBAR_HEIGHT,
     justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 5,
   },
   tabBar: {
-    flexDirection: 'row',
+    height: TABBAR_HEIGHT + 10,
     backgroundColor: '#fff',
-    bottom: 10,
+    top: 10,
+  },
+  tabBarContainer: {
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    gap: 8,
   },
   tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ebeaeaff',
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 24,
   },
-  indicator: {
-    backgroundColor: '#008CFF',
-    height: 3.5,
-    width: '80%',
-    position: 'absolute',
-    bottom: 0,
-    borderRadius: 122,
+  tabItemActive: {
+    backgroundColor: '#333',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  tabTextActive: {
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  emptyTab: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
 });

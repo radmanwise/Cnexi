@@ -11,6 +11,7 @@ import LikeButton from '../buttons/LikeButton';
 import SaveButton from '../buttons/SaveButton';
 import PostMenu from './PostMenu';
 import ipconfig from '../../config/ipconfig';
+import BadgeCheck from '../icons/BadgeCheck';
 import * as Font from 'expo-font';
 import {
   View,
@@ -115,8 +116,6 @@ const PostScreen = ({ filter, scrollY }) => {
     []);
 
 
-
-
   const renderPostHeader = useCallback(({ item }) => (
     <View style={styles.header}>
       <View style={styles.profileStatus}>
@@ -133,6 +132,7 @@ const PostScreen = ({ filter, scrollY }) => {
             cacheKey={`profile-${item.username}`}
           />
           <Text style={styles.username}>{truncateText(item.username || 'username', 12)}</Text>
+          {item.username === 'voss' && <BadgeCheck />}
         </TouchableOpacity>
         <PostMenu style={{ left: 8 }} />
       </View>
@@ -212,12 +212,11 @@ const PostScreen = ({ filter, scrollY }) => {
               ref={ref => videoRefs.current[index] = ref}
               source={{ uri: item.files[0].file }}
               style={styles.mediaContent}
-              resizeMode="contain"
+              resizeMode="cover"
               isLooping
               isMuted={!state.isPlaying[index]}
               useNativeControls={false}
               shouldPlay={state.isPlaying[index]}
-              height="169%"
             />
           </TouchableWithoutFeedback>
         ) : (
@@ -239,13 +238,14 @@ const PostScreen = ({ filter, scrollY }) => {
 
       <View style={styles.actionsContainer}>
         <View style={styles.leftActions} onStartShouldSetResponder={() => true}>
-          <LikeButton postId={item.id} initialLiked={item.is_liked} />
+          <LikeButton postId={item.id} initialLiked={item.is_liked} iconSize={28} />
           <View onStartShouldSetResponder={() => true}>
-            <CommentButton postId={item.id} />
+            <CommentButton postId={item.id} iconSize={28} />
           </View>
+          {/* <ShareButton postId={item.id} iconColor="black" iconSize={23} /> */}
         </View>
         <View style={styles.rightActions}>
-          <SaveButton postId={item.id} initialSaved={item.is_saved} />
+          <SaveButton postId={item.id} initialSaved={item.is_saved} iconSize={23} />
         </View>
       </View>
 
@@ -299,8 +299,8 @@ const PostScreen = ({ filter, scrollY }) => {
           refreshing={state.refreshing}
           onRefresh={onRefresh}
           progressViewOffset={150}
-          colors={['#000000ff']} 
-          tintColor="#000000ff"  
+          colors={['#000000ff']}
+          tintColor="#000000ff"
           progressBackgroundColor="#ffffffff"
         />
       }
@@ -331,6 +331,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#ffff',
     borderBottomColor: "#E0E0E0",
     borderBottomWidth: 0.5,
+
   },
   header: {
     padding: 10,
@@ -344,6 +345,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 5
   },
   profileImage: {
     height: PROFILE_IMAGE_SIZE,
@@ -352,7 +354,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 13,
-    marginLeft: 8,
+    marginLeft: 0,
     color: 'black',
     fontFamily: 'ManropeSemiBold',
     fontWeight: '600',
@@ -367,8 +369,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     left: 8,
-    borderWidth: 0.3,
-    borderColor: 'gray'
   },
   slideContainer: {
     width: SCREEN_WIDTH,
@@ -376,19 +376,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffff',
+    borderWidth: 0.3,
+    borderColor: 'gray'
   },
   mediaContent: {
-    width: SCREEN_WIDTH,
+    width: '100%',
     height: '100%',
     backgroundColor: '#ffff',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
-  },
-  video: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: '#ffff',
+    borderRadius: 12
   },
   paginationDots: {
     flexDirection: 'row',

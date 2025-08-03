@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-const ThumbsUpIcon = ({ size = 24, color = 'currentColor', strokeWidth = 1.6 }) => (
+const ThumbsUpIcon = ({ size = 24, color = 'currentColor', strokeWidth = 1.8 }) => (
   <Svg
     width={size}
     height={size}
@@ -12,8 +12,7 @@ const ThumbsUpIcon = ({ size = 24, color = 'currentColor', strokeWidth = 1.6 }) 
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <Path d="M7 10v12" />
-    <Path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+    <Path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
   </Svg>
 );
 

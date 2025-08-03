@@ -54,7 +54,7 @@ const LikeButton = ({ postId, initialLiked, onLikeError, iconColor = "#000", ico
       disabled={isLoading}
     >
       {liked ? (
-        <LikeIcon size={iconSize} color="#008CFF" />
+        <LikeSolidIcon size={iconSize} color="#ff0000ff" />
       ) : (
         <LikeIcon size={iconSize} color={iconColor} />
       )}

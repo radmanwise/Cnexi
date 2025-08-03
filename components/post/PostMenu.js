@@ -15,6 +15,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { UserRoundXIcon, EllipsisVerticalIcon } from 'lucide-react-native';
+import MenuDotIcon from '../../components/icons/MenuDotIcon';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -39,7 +40,7 @@ const PostMenu = ({
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 300,
-        easing: Easing.out(Easing.poly(4)),
+        easing: Easing.out(Easing.poly(2)),
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
@@ -100,11 +101,11 @@ const PostMenu = ({
   return (
     <>
       <TouchableOpacity
-        style={[styles.menuButton, style]}
+        style={[styles.menuButton]}
         onPress={open}
         activeOpacity={0.7}
       >
-        <EllipsisVerticalIcon size={21} color={theme === 'dark' ? '#CCC' : '#777'} />
+        <MenuDotIcon size={22} color={'black'} />
       </TouchableOpacity>
 
       <Modal

@@ -3,6 +3,7 @@ import { TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import BookmarkIcon from '../../components/icons/BookmarkIcon';
+import BookmarkIconSold from '../../components/icons/BookmarkIconSold';
 import ipconfig from '../../config/ipconfig';
 
 const SaveButton = ({ postId, initialSaved, onSaveError, iconSize = 24, iconColor = '#000' }) => {
@@ -71,15 +72,27 @@ const SaveButton = ({ postId, initialSaved, onSaveError, iconSize = 24, iconColo
   }, [postId, saved, isLoading, onSaveError]);
   
   return (
+    //     <TouchableOpacity 
+    //   onPress={handleSave} 
+    //   style={styles.button}
+    //   disabled={isLoading}
+    // >
+    //   {saved ? (
+    //     <BookmarkIconSold size={iconSize} color="#000000ff" />
+    //   ) : (
+    //     <BookmarkIcon size={iconSize} color={iconColor} />
+    //   )}
+    // </TouchableOpacity>
     <TouchableOpacity 
       onPress={handleSave} 
       style={styles.button}
       disabled={isLoading}
     >
-      <BookmarkIcon 
-        size={iconSize} 
-        color={saved ? 'blue' : iconColor} 
-      />
+      {saved ? (
+       <BookmarkIconSold size={iconSize} color="#000000ff" />
+     ) : (
+       <BookmarkIcon size={iconSize} color={iconColor} />
+     )} 
     </TouchableOpacity>
   );
 };

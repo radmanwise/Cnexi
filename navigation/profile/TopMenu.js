@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    fontSize: width * 0.050,
+    fontSize: 18,
     color: '#272727ff',
   },
 

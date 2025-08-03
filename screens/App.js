@@ -107,8 +107,36 @@ const ProfileStack = () => {
 
       <Stack.Screen name="PostDetailScreen" component={PostDetailScreen} options={{ headerShown: false }} />
 
-      <Stack.Screen name="FollowersScreen" component={FollowersScreen} options={{ title: 'Followers', headerShown: true }} />
-      <Stack.Screen name="FollowingScreen" component={FollowingScreen} options={{ title: 'Following', headerShown: true }} />
+      <Stack.Screen name="FollowersScreen" component={FollowersScreen} options={({ navigation }) => ({
+        title: '',
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#ffffffff',
+        },
+
+        headerTitle: () => (
+          <Title style={{ color: 'black', fontSize: 20, top: -2 }}>
+            Followers
+          </Title>
+        ),
+
+      })} />
+      <Stack.Screen name="FollowingScreen" component={FollowingScreen} options={({ navigation }) => ({
+        title: '',
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#ffffffff',
+        },
+
+        headerTitle: () => (
+          <Title style={{ color: 'black', fontSize: 20, top: -2 }}>
+            Following
+          </Title>
+        ),
+
+      })} />
       <Stack.Screen name="Block" component={Block} options={{ headerShown: false }} />
 
       <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />

@@ -15,13 +15,18 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
-  RefreshControl
+  RefreshControl,
+  Modal,
+  Dimensions
 } from 'react-native';
 import ipconfig from '../config/ipconfig';
 import * as Font from 'expo-font';
 import { Animated } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { Easing } from 'react-native-reanimated';
+import { Subtitle, Title } from '../components/ui/Typography';
+
 
 export default function OtherUserProfileScreen({ route }) {
   const { t } = useTranslation();
@@ -35,7 +40,77 @@ export default function OtherUserProfileScreen({ route }) {
   const [showFullBio, setShowFullBio] = useState(false);
   const [currentUserSlug, setCurrentUserSlug] = useState('');
   const [userFollowState, setUserFollowState] = useState(profileData?.is_following);
+  const profileImageRef = useRef(null);
+  const [imageLayout, setImageLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+  const { width, height } = Dimensions.get('window');
+  const centerX = width / 2;
+  const centerY = height / 2;
 
+  const showModal = () => {
+    scaleAnim.setValue(1);
+    translateX.setValue(0);
+    translateY.setValue(0);
+
+    setIsModalVisible(true);
+
+    setTimeout(() => {
+      const moveX = centerX - (imageLayout.x + imageLayout.width / 2);
+      const moveY = centerY - (imageLayout.y + imageLayout.height / 2);
+
+      Animated.parallel([
+        Animated.timing(scaleAnim, {
+          toValue: 3,
+          duration: 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateX, {
+          toValue: moveX,
+          duration: 150,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: moveY,
+          duration: 150,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 10);
+  };
+
+  const hideModal = () => {
+    const moveX = centerX - (imageLayout.x + imageLayout.width / 2);
+    const moveY = centerY - (imageLayout.y + imageLayout.height / 2);
+
+    Animated.parallel([
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: 150,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 150,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => setIsModalVisible(false), 100);
+  };
 
   const handleFollowChange = (newFollowState) => {
     setUserFollowState(newFollowState);
@@ -53,16 +128,18 @@ export default function OtherUserProfileScreen({ route }) {
 
     return (
       <View style={styles.bioContainer}>
-        <Text style={styles.biography}>
-          {showFullBio ? bioText : truncateText(bioText, MAX_BIO_LENGTH)}
-        </Text>
-        {shouldShowButton && (
-          <TouchableOpacity onPress={toggleBio} style={styles.seeMoreButton}>
-            <Text style={styles.seeMoreText}>
-              {showFullBio ? 'See Less' : 'See More'}
-            </Text>
-          </TouchableOpacity>
-        )}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setShowFullBio(!showFullBio)}
+              style={styles.bioContainer}
+            >
+              <Subtitle style={styles.biography}>
+                {showFullBio ? profileData?.bio : truncateText(profileData?.bio || '', MAX_BIO_LENGTH)}
+              </Subtitle>
+              {!showFullBio && (profileData?.bio?.length || 0) > MAX_BIO_LENGTH && (
+                <Text style={styles.seeMoreText}></Text>
+              )}
+            </TouchableOpacity>
       </View>
     );
   };
@@ -81,18 +158,6 @@ export default function OtherUserProfileScreen({ route }) {
     return str.length > maxLength ? str.substring(0, maxLength) + '...' : str;
   };
 
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        'Manrope': require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
-        'ManropeSemiBold': require('../assets/fonts/Manrope/Manrope-SemiBold.ttf'),
-      });
-      setFontsLoaded(true);
-    }
-    loadFonts();
-  }, []);
 
   const formatNumber = (number) => {
     return new Intl.NumberFormat(t.language, {
@@ -160,14 +225,44 @@ export default function OtherUserProfileScreen({ route }) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#ffff' }}>
+      <Modal visible={isModalVisible} transparent animationType="none">
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={hideModal}
+          style={styles.modalOverlay}
+        >
+          <Animated.View
+            style={{
+              position: 'absolute',
+              left: imageLayout.x,
+              top: imageLayout.y,
+              width: imageLayout.width,
+              height: imageLayout.height,
+              transform: [
+                { translateX: translateX },
+                { translateY: translateY },
+                { scale: scaleAnim },
+              ],
+              borderRadius: 100,
+              overflow: 'hidden',
+            }}
+          >
+            <Image
+              source={{ uri: imageUrl }}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
       <View style={styles.topMenuContainer}>
         <View style={styles.topMenuContent}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={25} color="black" />
           </TouchableOpacity>
-          <Text style={styles.topMenuTitle}>
+          <Title style={styles.topMenuTitle}>
             {profileData?.name || 'Profile'}
-          </Text>
+          </Title>
           <TouchableOpacity
             style={styles.moreButton}
             onPress={() => {
@@ -190,13 +285,27 @@ export default function OtherUserProfileScreen({ route }) {
       >
         <View style={styles.container}>
           <View style={styles.ProfileView}>
-            <Image
-              style={styles.profileImage}
-              source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl}
-              onError={(error) => console.error('Error loading image:', error.nativeEvent.error)}
-            />
+            <TouchableOpacity
+              onPress={() => {
+                profileImageRef.current.measure((fx, fy, width, height, px, py) => {
+                  setImageLayout({ x: px, y: py, width, height });
+                  showModal();
+                });
+              }}
+            >
+              <Image
+                ref={profileImageRef}
+                style={styles.profileImage}
+                source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl}
+                onError={(error) => console.error('Error loading image:', error.nativeEvent.error)}
+                onLayout={(event) => {
+                  const { x, y, width, height } = event.nativeEvent.layout;
+                  setImageLayout({ x, y, width, height });
+                }}
+              />
+            </TouchableOpacity>
 
-            <Text style={styles.username}>{truncateText(profileData?.username_i || 'username', 12)}</Text>
+            <Subtitle style={styles.username}>{truncateText(profileData?.username_i || 'username', 12)}</Subtitle>
 
             <View style={styles.buttonStyle}>
               {currentUserSlug && profileData?.username_i && currentUserSlug === profileData.username_i ? (
@@ -213,17 +322,16 @@ export default function OtherUserProfileScreen({ route }) {
                     backgroundColor: '#f9f9f9',
                   }}
                 >
-                  <Text
+                  <Subtitle
                     style={{
                       fontWeight: '600',
                       fontSize: 13,
                       textAlign: 'center',
                       color: '#000',
-                      fontFamily: 'Manrope',
                     }}
                   >
                     {t('Edit Profile')}
-                  </Text>
+                  </Subtitle>
                 </TouchableOpacity>
               ) : (
                 <View>
@@ -231,6 +339,20 @@ export default function OtherUserProfileScreen({ route }) {
                     <FollowButton
                       userId={userId}
                       initialIsFollowing={!!profileData.is_following}
+                      buttonStyle={{
+                        borderRadius: 10,
+                        borderColor: 'black',
+                        borderWidth: 0,
+                        padding: 8,
+                        width: 130,
+                        backgroundColor: '#0048ffff',
+                        left: -50
+                      }}
+                      textStyle={{ fontSize: 11 }}
+                      borderColor="#000000ff"
+                      followColor="#0073ffff"
+                      unfollowTextColor="#ffffffff"
+                      followTextColor="#ffffffff"
                     />
                   )}
                 </View>
@@ -240,23 +362,23 @@ export default function OtherUserProfileScreen({ route }) {
 
           <View style={styles.profileStatus}>
             <View style={styles.profileInformation}>
-              <Text style={styles.count}>{formattedPostCount}</Text>
-              <Text style={styles.label}>{t('posts')}</Text>
+              <Title style={styles.count}>{formattedPostCount}</Title>
+              <Subtitle style={styles.label}>{t('posts')}</Subtitle>
             </View>
             <View style={styles.profileInformation}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('FollowersScreen', { userId })}
                 style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={styles.count}>{formattedFollowersCount}</Text>
-                <Text style={styles.label}>{t('followers')}</Text>
+                <Title style={styles.count}>{formattedFollowersCount}</Title>
+                <Subtitle style={styles.label}>{t('followers')}</Subtitle>
               </TouchableOpacity>
             </View>
             <View style={styles.profileInformation}>
               <TouchableOpacity
                 onPress={() => navigation.navigate('FollowingScreen', { userId })}
                 style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={styles.count}>{formattedFollowingCount}</Text>
-                <Text style={styles.label}>{t('following')}</Text>
+                <Title style={styles.count}>{formattedFollowingCount}</Title>
+                <Subtitle style={styles.label}>{t('following')}</Subtitle>
               </TouchableOpacity>
             </View>
           </View>
@@ -278,21 +400,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffff',
   },
   ProfileView: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#ffffffff',
     width: '92%',
-    marginTop: 15,
+    marginTop: 5,
     borderRadius: 50,
     padding: 1,
     borderBottomRightRadius: 25,
     borderTopRightRadius: 25,
     shadowColor: 'black',
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
   },
-  username: {
-    position: 'absolute',
-    marginLeft: '25%',
-    fontSize: 15,
-    fontFamily: 'ManropeSemiBold',
-    marginTop: '9%',
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileImage: {
     height: 88,
@@ -300,7 +423,16 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderColor: '#ffff',
     borderWidth: 2,
+    backgroundColor: '#e0e0e0',
   },
+  username: {
+    position: 'absolute',
+    marginLeft: '25%',
+    fontSize: 15,
+    marginTop: '9%',
+    color: 'black'
+  },
+
   buttonStyle: {
     marginTop: 20,
     position: 'absolute',
@@ -322,20 +454,19 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     color: '#3A3B3C',
-    fontFamily: 'Manrope',
   },
   count: {
     fontSize: 14,
-    fontFamily: 'ManropeSemiBold',
     padding: 5,
+    color: 'black'
   },
   bioContainer: {
-    marginTop: -25,
-    maxWidth: 360,
+    marginTop: -10,
+    maxWidth: 350,
   },
   biography: {
     fontSize: 13,
-    fontFamily: 'Manrope',
+    color: 'black',
     lineHeight: 18,
   },
   seeMoreButton: {
@@ -354,7 +485,7 @@ const styles = StyleSheet.create({
   },
   topMenuContainer: {
     backgroundColor: '#fff',
-    paddingTop: 50,
+    paddingTop: 38,
     paddingBottom: 10,
   },
   topMenuContent: {
@@ -365,9 +496,9 @@ const styles = StyleSheet.create({
   },
   topMenuTitle: {
     fontSize: 16,
-    fontFamily: 'Manrope',
     textAlign: 'center',
     flex: 1,
+    color: 'black'
   },
   moreButton: {
     width: 40,

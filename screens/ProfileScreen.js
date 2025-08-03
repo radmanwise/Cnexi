@@ -178,7 +178,9 @@ export default function ProfileScreen() {
     );
   }
 
-  const imageUrl = `${ipconfig.BASE_URL}/${profileData?.picture}`;
+  const imageUrl = profileData?.picture 
+  ? `${ipconfig.BASE_URL}/${profileData.picture}` 
+  : require('../assets/img/static/user.jpg');
   const isCurrentUser = profileData?.slug === username;
 
   return (
@@ -233,7 +235,7 @@ export default function ProfileScreen() {
             >
               <Image
                 ref={profileImageRef}
-                source={{ uri: imageUrl }}
+                source={imageUrl ? { uri: imageUrl } : require('../assets/img/static/user.jpg')}
                 style={styles.profileImage}
                 onLayout={(event) => {
                   const { x, y, width, height } = event.nativeEvent.layout;
@@ -304,7 +306,7 @@ export default function ProfileScreen() {
 
           </View>
         </View>
-        <View style={{ bottom: 70 }}>
+        <View style={{ bottom: 55 }}>
           <PostList posts={profileData?.posts || []} />
         </View>
       </ScrollView>

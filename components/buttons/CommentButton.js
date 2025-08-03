@@ -1,29 +1,32 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, TextInput } from 'react-native';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, TextInput, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 import ipconfig from '../../config/ipconfig';
 import CommentIcon from '../../components/icons/CommentIcon';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Title, Subtitle } from '../../components/ui/Typography';
 import FastImage from 'expo-fast-image';
 import TelegramIcon from '../../components/icons/TelegramIcon';
+import LikeIcon from '../../components/icons/LikeIcon';
+import DisLikeIcon from '../../components/icons/DisLikeIcon';
 
-const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
+const CommentsButton = ({ postId, iconSize = 24, iconColor = '#000' }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isReplyModalVisible, setReplyModalVisible] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [isScrollingToTop, setIsScrollingToTop] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+    setError(null);
   };
 
   const truncateText = useMemo(() => (str, maxLength) =>
@@ -32,22 +35,23 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
 
   const navigation = useNavigation();
 
-  const getToken = async () => {
+  const getToken = useCallback(async () => {
     try {
       const token = await SecureStore.getItemAsync('token');
       if (!token) {
-        console.error('No token found');
-        return null;
+        throw new Error('No token found');
       }
       return token;
     } catch (error) {
       console.error('Error retrieving token:', error);
+      setError('Authentication error. Please login again.');
       return null;
     }
-  };
+  }, []);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
+      setIsLoading(true);
       const token = await getToken();
       if (!token) return;
 
@@ -59,35 +63,38 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
       });
 
       setComments(response.data.results);
-
+      setError(null);
     } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response.status, error.response.data);
-      } else if (error.request) {
-        console.error("Network Error:", error.request);
-      } else {
-        console.error("Error:", error.message);
-      }
+      console.error("Error fetching comments:", error);
+      setError('Failed to load comments. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [postId, getToken]);
 
   useEffect(() => {
     if (isModalVisible) {
       fetchComments();
     }
-  }, [isModalVisible]);
+  }, [isModalVisible, fetchComments]);
 
   const renderReply = ({ item }) => (
     <View style={styles.replyContainer}>
       <View style={styles.replyLine} />
       <View style={styles.replyContent}>
-        <Image
-          source={{ uri: `${ipconfig.BASE_URL}/${item.profile_image}` }}
+        <FastImage
+          source={{ uri: item.profile_image?.startsWith('http') ? item.profile_image : `${ipconfig.BASE_URL}${item.profile_image}` }}
           style={styles.replyProfileImage}
+          cacheKey={`reply-profile-${item.id}`}
         />
         <View style={styles.replyTextContainer}>
           <Subtitle style={styles.replyUsername}>{item.username}</Subtitle>
           <Subtitle style={styles.replyText}>{item.text}</Subtitle>
+          {item.created_at && (
+            <Subtitle style={styles.replyTime}>
+              {formatDistanceToNow(parseISO(item.created_at), { addSuffix: true })}
+            </Subtitle>
+          )}
         </View>
       </View>
     </View>
@@ -98,110 +105,90 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
     setReplyModalVisible(true);
   };
 
-  const handleSubmitReply = () => {
-    if (replyText && selectedCommentId) {
-      addReply(replyText, selectedCommentId);
+  const handleSubmitReply = async () => {
+    if (!replyText || !selectedCommentId) return;
+
+    try {
+      await addReply(replyText, selectedCommentId);
       setReplyText('');
       setReplyModalVisible(false);
+      fetchComments();
+    } catch (error) {
+      setError('Failed to post reply. Please try again.');
     }
   };
 
   const addComment = async (commentText, postId) => {
+    if (!commentText.trim()) return;
+
     try {
       const token = await getToken();
-      console.log("Token:", token);
+      if (!token) return;
 
-      if (token) {
-        const tokenParts = token.split('.');
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          const userId = payload.user_id;
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) throw new Error('Invalid token format');
 
-          if (userId) {
-            const response = await axios.post(
-              `${ipconfig.BASE_URL}/post/${postId}/comments/create/`,
-              {
-                text: commentText,
-                post: postId,
-                user: userId,
-              },
-              {
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
+      const payload = JSON.parse(atob(tokenParts[1]));
+      const userId = payload.user_id;
+      if (!userId) throw new Error('User ID not found in token');
 
-            if (response.status === 201) {
-              setNewComment('');
-              fetchComments();
-            }
-            return response.data;
-          }
+      await axios.post(
+        `${ipconfig.BASE_URL}/post/${postId}/comments/create/`,
+        {
+          text: commentText,
+          post: postId,
+          user: userId,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      }
+      );
 
-      throw new Error('Could not get user ID from token');
+      setNewComment('');
+      fetchComments();
     } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response.status, error.response.data);
-      } else {
-        console.error("Error:", error.message);
-      }
+      console.error("Error adding comment:", error);
+      setError('Failed to post comment. Please try again.');
     }
   };
-
 
   const addReply = async (replyText, commentId) => {
     try {
       const token = await getToken();
-      console.log("Token for reply:", token);
+      if (!token) return;
 
-      if (token) {
-        const tokenParts = token.split('.');
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          const userId = payload.user_id;
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) throw new Error('Invalid token format');
 
-          if (userId) {
-            const response = await axios.post(
-              `${ipconfig.BASE_URL}/post/comments/${commentId}/reply/`,
-              {
-                text: replyText,
-                user: userId,
-                comment: commentId,
-                post_id: postId
-              },
-              {
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
+      const payload = JSON.parse(atob(tokenParts[1]));
+      const userId = payload.user_id;
+      if (!userId) throw new Error('User ID not found in token');
 
-            if (response.status === 201) {
-              fetchComments();
-            }
-            return response.data;
-          }
+      await axios.post(
+        `${ipconfig.BASE_URL}/post/comments/${commentId}/reply/`,
+        {
+          text: replyText,
+          user: userId,
+          comment: commentId,
+          post_id: postId
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      }
-
-      throw new Error('Could not get user ID from token');
+      );
     } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response.status, error.response.data);
-      } else {
-        console.error("Error:", error.message);
-      }
+      console.error("Error adding reply:", error);
+      throw error;
     }
   };
 
   const renderComment = ({ item }) => {
-    const timeAgo = formatDistanceToNow(new Date(item.created_at), { addSuffix: true });
-
     return (
       <View style={styles.commentContainer}>
         <View style={styles.commentHeader}>
@@ -211,15 +198,19 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
               onPress={() => navigation.navigate('OtherUserProfile', { slug: item.username })}
             >
               <FastImage
-                source={{ uri: item.profile_image }}
+                source={{ uri: item.profile_image?.startsWith('http') ? item.profile_image : `${ipconfig.BASE_URL}${item.profile_image}` }}
                 style={styles.profileImage}
-                cacheKey={`profile-${item.username}`}
+                cacheKey={`comment-profile-${item.id}`}
               />
               <Subtitle style={styles.username}>
                 {truncateText(item.username || 'username', 12)}
               </Subtitle>
+              {item.created_at && (
+                <Subtitle style={styles.time}>
+                  {formatDistanceToNow(parseISO(item.created_at), { addSuffix: true })}
+                </Subtitle>
+              )}
             </TouchableOpacity>
-
           </View>
           <TouchableOpacity>
             <MaterialCommunityIcons name="dots-horizontal" size={20} color="#666" />
@@ -229,17 +220,19 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
         <View style={styles.commentBody}>
           {item.text && <Subtitle style={styles.commentText}>{item.text}</Subtitle>}
           {item.file && (
-            <Image
-              source={{ uri: `${ipconfig.BASE_URL}/${item.file}` }}
+            <FastImage
+              source={{ uri: item.file.startsWith('http') ? item.file : `${ipconfig.BASE_URL}${item.file}` }}
               style={styles.filePost}
               resizeMode="contain"
+              cacheKey={`comment-file-${item.id}`}
             />
           )}
         </View>
 
         <View style={styles.commentFooter}>
           <View style={styles.footerLeft}>
-            <Subtitle style={styles.likes}>{item.likes} likes</Subtitle>
+            <LikeIcon name="thumb-up" size={20} color="black" />
+            <DisLikeIcon name="thumb-down" size={20} color="black" />
             <TouchableOpacity onPress={() => handleReply(item.id)}>
               <Subtitle style={styles.replyButton}>Reply</Subtitle>
             </TouchableOpacity>
@@ -251,6 +244,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
             data={item.replies}
             renderItem={renderReply}
             keyExtractor={reply => reply.id.toString()}
+            scrollEnabled={false}
           />
         )}
       </View>
@@ -265,85 +259,91 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
 
       <Modal
         isVisible={isModalVisible}
-        onBackdropPress={(e) => {
-          e.stopPropagation();
-          toggleModal();
-        }}
+        onBackdropPress={toggleModal}
         onBackButtonPress={toggleModal}
         onSwipeComplete={toggleModal}
+        swipeDirection={['down']}
         style={styles.modal}
         backdropOpacity={0.5}
         statusBarTranslucent={true}
-        coverScreen={true}
-        propagateSwipe={false}
         avoidKeyboard={true}
+        propagateSwipe={true}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
       >
-        <TouchableOpacity
-          activeOpacity={1}
-          style={styles.modalContentWrapper}
-          onPress={(e) => e.stopPropagation()}
-        >
+        <View style={styles.modalContentWrapper}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <View style={styles.modalHandle} />
               <Title style={styles.commentCount}>
-                {comments.length} comments
+                {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
               </Title>
             </View>
 
-            <FlatList
-              data={comments}
-              renderItem={renderComment}
-              keyExtractor={item => item.id.toString()}
-              ListEmptyComponent={() => (
-                <View style={styles.emptyContainer}>
-                  <Subtitle style={styles.emptyText}>No comments yet</Subtitle>
-                  <Subtitle style={styles.emptySubText}>Be the first to comment</Subtitle>
-                </View>
-              )}
-              showsVerticalScrollIndicator={true}
-              style={styles.commentsList}
-              contentContainerStyle={[
-                styles.commentsListContent,
-                comments.length === 0 && { flex: 1 }
-              ]}
-              bounces={true}
-              onEndReachedThreshold={0.1}
-              initialNumToRender={10}
-              maxToRenderPerBatch={10}
-              windowSize={10}
-            />
-
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#007AFF" />
+              </View>
+            ) : error ? (
+              <View style={styles.errorContainer}>
+                <Subtitle style={styles.errorText}>{error}</Subtitle>
+                <TouchableOpacity onPress={fetchComments}>
+                  <Subtitle style={styles.retryText}>Retry</Subtitle>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <FlatList
+                data={comments}
+                renderItem={renderComment}
+                keyExtractor={item => item.id.toString()}
+                ListEmptyComponent={() => (
+                  <View style={styles.emptyContainer}>
+                    <Subtitle style={styles.emptyText}>No comments yet</Subtitle>
+                    <Subtitle style={styles.emptySubText}>Be the first to comment</Subtitle>
+                  </View>
+                )}
+                contentContainerStyle={[
+                  styles.commentsListContent,
+                  comments.length === 0 && { flex: 1 }
+                ]}
+                initialNumToRender={5}
+                maxToRenderPerBatch={5}
+                windowSize={10}
+                keyboardShouldPersistTaps="handled"
+              />
+            )}
 
             <View style={styles.inputContainer}>
               <TextInput
                 value={newComment}
                 onChangeText={setNewComment}
                 placeholder="Write a comment..."
+                placeholderTextColor="#999"
                 style={styles.input}
-                selectionColor="gray"
-                onTouchStart={(e) => e.stopPropagation()}
+                multiline
+                returnKeyType="send"
+                onSubmitEditing={() => addComment(newComment, postId)}
               />
               {newComment.length > 0 && (
                 <TouchableOpacity
                   style={styles.sendButton}
                   onPress={() => addComment(newComment, postId)}
+                  disabled={isLoading}
                 >
                   <TelegramIcon name="send" size={20} color="#ffff" />
                 </TouchableOpacity>
               )}
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
 
       <Modal
         isVisible={isReplyModalVisible}
         onBackdropPress={() => setReplyModalVisible(false)}
         onBackButtonPress={() => setReplyModalVisible(false)}
-        style={styles.modal}
+        style={styles.replyModal}
         backdropOpacity={0.5}
-
       >
         <View style={styles.replyModalContent}>
           <View style={styles.modalHandle} />
@@ -351,8 +351,11 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
             value={replyText}
             onChangeText={setReplyText}
             placeholder="Write a reply..."
+            placeholderTextColor="#999"
             style={styles.replyInput}
             multiline
+            returnKeyType="send"
+            onSubmitEditing={handleSubmitReply}
           />
           <TouchableOpacity
             style={[
@@ -360,7 +363,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
               !replyText && styles.sendButtonDisabled
             ]}
             onPress={handleSubmitReply}
-            disabled={!replyText}
+            disabled={!replyText || isLoading}
           >
             <TelegramIcon name="send" size={20} color="#ffff" />
           </TouchableOpacity>
@@ -370,203 +373,213 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  commentButton: {
+    padding: 8,
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'flex-end',
+  },
+  replyModal: {
+    margin: 0,
+    justifyContent: 'flex-end',
+  },
+ modalContentWrapper: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    height: '80%',
+    width: '100%', 
+  },
+  
+  modalContent: {
+    flex: 1, 
+    paddingTop: 8,
+  },
+
+  modalHeader: {
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#e0e0e0',
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#ccc',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  commentCount: {
+    color: '#000',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  commentsListContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
   commentContainer: {
-    marginBottom: 0,
-    padding: 5,
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#e0e0e0',
   },
   commentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 0,
+    marginBottom: 8,
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: -10,
-    paddingHorizontal: -10,
   },
   profileImage: {
-    width: 35,
-    height: 35,
-    borderRadius: 50,
-    marginRight: 5,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
   },
   username: {
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: 14,
     color: '#1a1a1a',
   },
   time: {
-    color: '#101010ff',
-    fontSize: 13,
-    marginLeft: 6,
+    color: '#666',
+    fontSize: 12,
+    marginLeft: 8,
   },
-
   commentBody: {
-    marginVertical: 10,
+    marginVertical: 8,
   },
   commentText: {
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 20,
-    color: '#2c2c2c',
+    color: '#333',
   },
   filePost: {
     width: '100%',
     height: 200,
-    borderRadius: 12,
-    marginTop: 10,
+    borderRadius: 8,
+    marginTop: 8,
   },
-
   commentFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    top: -10,
+    marginTop: 8,
   },
   footerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
   },
-  likes: {
+  replyButton: {
+    color: '#007AFF',
     fontSize: 13,
-    color: '#666',
     fontWeight: '500',
   },
-  replyButton: {
-    color: 'gray',
-    fontSize: 12,
-    fontWeight: '600',
-  },
   replyContainer: {
-    marginLeft: 5,
-    marginTop: 10,
+    marginLeft: 16,
+    marginTop: 16,
   },
   replyLine: {
     position: 'absolute',
-    left: 10,
+    left: 16,
     top: 0,
     bottom: 0,
-    width: 1.5,
-    backgroundColor: '#009dffff',
+    width: 1,
+    backgroundColor: '#e0e0e0',
   },
   replyContent: {
     flexDirection: 'row',
-    paddingLeft: 20,
-    marginTop: 8,
+    paddingLeft: 32,
   },
   replyProfileImage: {
-    width: 35,
-    height: 35,
-    borderRadius: 50,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
   },
   replyTextContainer: {
-    marginLeft: 10,
     flex: 1,
   },
   replyUsername: {
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
     color: '#1a1a1a',
   },
   replyText: {
     fontSize: 13,
-    color: '#2c2c2c',
-    marginTop: 3,
-    lineHeight: 20,
+    color: '#333',
+    marginTop: 2,
+    lineHeight: 18,
   },
-
-  input: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 24,
-    padding: 14,
-    paddingRight: 45,
-    fontSize: 14,
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-  },
-  sendReplyButton: {
-    position: 'absolute',
-    right: 25,
-    bottom: 30,
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  modalContentWrapper: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    height: '55%',
-  },
-  modalContent: {
-    flex: 1,
-    paddingTop: 8,
-  },
-  modalHeader: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  commentsList: {
-    flex: 1,
-  },
-  commentsListContainer: {
-    flex: 1,
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  commentsListContent: {
-    paddingHorizontal: 15,
+  replyTime: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
   },
   inputContainer: {
-    padding: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    padding: 16,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#e0e0e0',
     backgroundColor: 'white',
   },
-  commentCount: {
-    color: 'black',
-    textAlign: 'center',
-    fontSize: 13,
-    marginTop: 5,
-    marginBottom: 10,
+  input: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    paddingRight: 48,
   },
-  modal: {
-    margin: 0,
-    justifyContent: 'flex-end',
-  },
-  modalHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 10,
+  replyInput: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    paddingRight: 48,
+    marginBottom: 16,
   },
   sendButton: {
     position: 'absolute',
-    right: 25,
-    bottom: 25,
+    right: 24,
+    bottom: 24,
     backgroundColor: '#007AFF',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  sendButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
+  sendReplyButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 24,
+    backgroundColor: '#007AFF',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#ccc',
   },
   emptyContainer: {
     flex: 1,
@@ -578,38 +591,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginBottom: 8,
-    fontWeight: '800',
+    fontWeight: '600',
   },
   emptySubText: {
     fontSize: 14,
     color: '#999',
   },
-  commentButton: {
-    padding: 14,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  replyModalContent: {
-    backgroundColor: 'white',
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
-  replyInput: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 24,
-    padding: 14,
-    paddingRight: 45,
+  errorText: {
+    color: '#ff3b30',
+    fontSize: 16,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  retryText: {
+    color: '#007AFF',
     fontSize: 14,
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    maxHeight: 100,
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#ccc',
+    fontWeight: '500',
   },
 });
 

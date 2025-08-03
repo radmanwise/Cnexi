@@ -7,7 +7,7 @@ const CaptionWithMore = ({ description }) => {
   const [animation] = useState(new Animated.Value(0));
 
   const [fontsLoaded] = useFonts({
-    'Manrope': require('../../assets/fonts/Manrope/Manrope-Medium.ttf'),
+    'Manrope': require('../../../assets/fonts/Manrope/Manrope-Medium.ttf'),
   });
 
   const toggleText = useCallback(() => {

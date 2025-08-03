@@ -20,16 +20,17 @@ import { Title, Subtitle } from '../../components/ui/Typography';
 import AllIcon from '../../components/icons/AllIcon';
 import MusicIcon from '../../components/icons/MusicIcon';
 import ReelsIcon from '../../components/icons/ReelsIcon';
+import { FlashList } from '@shopify/flash-list';
+
 
 const screenWidth = Dimensions.get('window').width;
 const itemSize = screenWidth / 3;
 
 const FileTypeIcon = {
   video: <ReelIcon size={20} color="white" />,
-  music: <Ionicons name="musical-notes" size={20} color="white" />,
+  music: <MusicIcon size={20} color="white" />,
   image: <ImageIcon size={26} color="white" />,
 };
-
 
 const Post = React.memo(({ post }) => {
   const navigation = useNavigation();
@@ -40,17 +41,19 @@ const Post = React.memo(({ post }) => {
       ? 'music'
       : 'image';
 
+  const handlePress = useCallback(() => {
+    navigation.navigate('PostDetailScreen', {
+      postId: post.id,
+      postTitle: post.title,
+      postContent: post.content,
+      files: post.files,
+    });
+  }, [navigation, post]);
+
   return (
     <TouchableOpacity
       style={styles.postContainer}
-      onPress={() =>
-        navigation.navigate('PostDetailScreen', {
-          postId: post.id,
-          postTitle: post.title,
-          postContent: post.content,
-          files: post.files,
-        })
-      }
+      onPress={handlePress}
       activeOpacity={0.8}
     >
       <View style={styles.mediaContainer}>
@@ -75,7 +78,7 @@ const Post = React.memo(({ post }) => {
       </View>
     </TouchableOpacity>
   );
-});
+}, (prev, next) => prev.post.id === next.post.id);
 
 const PostList = ({ posts, fetchPosts }) => {
   const [index, setIndex] = useState(0);
@@ -86,74 +89,26 @@ const PostList = ({ posts, fetchPosts }) => {
   ]);
 
   const [refreshing, setRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const postsPerPage = 12;
 
   const validPosts = useMemo(() => posts?.filter(p => p.id) || [], [posts]);
 
   const filterPosts = useCallback(
     (type) => {
-      if (type === 'all') return validPosts;
-      return validPosts.filter(post => post.files?.[0]?.endsWith('.mp4'));
+      return validPosts.filter(post => {
+        const uri = post.files?.[0] || '';
+        if (type === 'reels') return uri.endsWith('.mp4');
+        if (type === 'music') return uri.endsWith('.mp3');
+        return true;
+      });
     },
     [validPosts]
-  );
-
-  const handleLoadMore = useCallback(
-    (filteredPosts) => {
-      if (loadingMore) return;
-      if (filteredPosts.length > page * postsPerPage) {
-        setLoadingMore(true);
-        setPage(p => p + 1);
-        setLoadingMore(false);
-      }
-    },
-    [loadingMore, page]
   );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchPosts();
-    setPage(1);
     setRefreshing(false);
   }, [fetchPosts]);
-
-  const renderPosts = useCallback(
-    (filteredPosts) => (
-      <FlatList
-        data={filteredPosts.slice(0, page * postsPerPage)}
-        keyExtractor={item => `post-${item.id}`}
-        numColumns={3}
-        renderItem={({ item }) => <Post post={item} />}
-        columnWrapperStyle={styles.columnWrapper}
-        initialNumToRender={9}
-        maxToRenderPerBatch={6}
-        windowSize={5}
-        removeClippedSubviews={true}
-        onEndReached={() => handleLoadMore(filteredPosts)}
-        onEndReachedThreshold={0.5}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <View style={styles.IconContent}>
-              <ImageOffIcon size={40} color="#424242ff" />
-            </View>
-            <Text style={styles.emptyTitle}>No Posts Yet</Text>
-            <Text style={styles.emptySubTitle}>
-              Start the conversation by sharing your first post!
-            </Text>
-          </View>
-        )}
-        ListFooterComponent={() =>
-          loadingMore && <ActivityIndicator size="small" color="#008CFF" />
-        }
-        showsVerticalScrollIndicator={false}
-      />
-    ),
-    [page, refreshing, loadingMore, onRefresh, handleLoadMore]
-  );
 
   const renderTabBar = () => (
     <View style={styles.tabBar}>
@@ -178,11 +133,36 @@ const PostList = ({ posts, fetchPosts }) => {
     </View>
   );
 
-
+  const filteredPosts = filterPosts(routes[index].key);
+  const renderItem = useCallback(({ item }) => <Post post={item} />, []);
   return (
     <View style={{ flex: 1 }}>
       {renderTabBar()}
-      {renderPosts(filterPosts(routes[index].key))}
+      <FlashList
+        data={filteredPosts}
+        keyExtractor={item => `post-${item.id}`}
+        numColumns={3}
+        renderItem={renderItem}
+        estimatedItemSize={itemSize * 1.1}
+        columnWrapperStyle={styles.columnWrapper}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onEndReachedThreshold={0.3}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews
+        initialNumToRender={9}
+        maxToRenderPerBatch={9}
+        windowSize={5}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <ImageOffIcon size={40} color="#424242" />
+            <Text style={styles.emptyTitle}>No Posts Yet</Text>
+            <Text style={styles.emptySubTitle}>
+              Start the conversation by sharing your first post!
+            </Text>
+          </View>
+        )}
+      />
     </View>
   );
 };

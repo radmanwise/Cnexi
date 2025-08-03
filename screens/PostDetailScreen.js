@@ -1,4 +1,3 @@
-// Responsive & Clean Version of PostDetailScreen.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
@@ -21,7 +20,7 @@ import LikeButton from '../components/buttons/LikeButton';
 import SaveButton from '../components/buttons/SaveButton';
 import CommentButton from '../components/buttons/CommentButton';
 import PostMenu from '../components/post/PostMenu';
-import CaptionWithMore from '../components/post/CaptionWithMore';
+import CaptionWithMore from '../components/post/caption/CaptionWithMore';
 import ipconfig from '../config/ipconfig';
 import Subtitle from '../components/ui/Typography';
 

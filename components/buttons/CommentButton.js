@@ -9,7 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import ipconfig from '../../config/ipconfig';
 import CommentIcon from '../../components/icons/CommentIcon';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-
+import { Title, Subtitle } from '../../components/ui/Typography';
 import FastImage from 'expo-fast-image';
 import TelegramIcon from '../../components/icons/TelegramIcon';
 
@@ -86,8 +86,8 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
           style={styles.replyProfileImage}
         />
         <View style={styles.replyTextContainer}>
-          <Text style={styles.replyUsername}>{item.username}</Text>
-          <Text style={styles.replyText}>{item.text}</Text>
+          <Subtitle style={styles.replyUsername}>{item.username}</Subtitle>
+          <Subtitle style={styles.replyText}>{item.text}</Subtitle>
         </View>
       </View>
     </View>
@@ -208,18 +208,18 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
           <View style={styles.userInfo}>
             <TouchableOpacity
               style={styles.profileContainer}
-              onPress={() => {
-                navigation.navigate('OtherUserProfile', { slug: item.username });
-              }}
+              onPress={() => navigation.navigate('OtherUserProfile', { slug: item.username })}
             >
-
               <FastImage
                 source={{ uri: item.profile_image }}
                 style={styles.profileImage}
                 cacheKey={`profile-${item.username}`}
               />
-              <Text style={styles.username}>{truncateText(item.username || 'username', 12)}</Text>
+              <Subtitle style={styles.username}>
+                {truncateText(item.username || 'username', 12)}
+              </Subtitle>
             </TouchableOpacity>
+
           </View>
           <TouchableOpacity>
             <MaterialCommunityIcons name="dots-horizontal" size={20} color="#666" />
@@ -227,7 +227,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
         </View>
 
         <View style={styles.commentBody}>
-          {item.text && <Text style={styles.commentText}>{item.text}</Text>}
+          {item.text && <Subtitle style={styles.commentText}>{item.text}</Subtitle>}
           {item.file && (
             <Image
               source={{ uri: `${ipconfig.BASE_URL}/${item.file}` }}
@@ -239,9 +239,9 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
 
         <View style={styles.commentFooter}>
           <View style={styles.footerLeft}>
-            <Text style={styles.likes}>{item.likes} likes</Text>
+            <Subtitle style={styles.likes}>{item.likes} likes</Subtitle>
             <TouchableOpacity onPress={() => handleReply(item.id)}>
-              <Text style={styles.replyButton}>Reply</Text>
+              <Subtitle style={styles.replyButton}>Reply</Subtitle>
             </TouchableOpacity>
           </View>
         </View>
@@ -286,9 +286,9 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <View style={styles.modalHandle} />
-              <Text style={styles.commentCount}>
+              <Title style={styles.commentCount}>
                 {comments.length} comments
-              </Text>
+              </Title>
             </View>
 
             <FlatList
@@ -297,8 +297,8 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
               keyExtractor={item => item.id.toString()}
               ListEmptyComponent={() => (
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>No comments yet</Text>
-                  <Text style={styles.emptySubText}>Be the first to comment</Text>
+                  <Subtitle style={styles.emptyText}>No comments yet</Subtitle>
+                  <Subtitle style={styles.emptySubText}>Be the first to comment</Subtitle>
                 </View>
               )}
               showsVerticalScrollIndicator={true}
@@ -343,6 +343,7 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
         onBackButtonPress={() => setReplyModalVisible(false)}
         style={styles.modal}
         backdropOpacity={0.5}
+
       >
         <View style={styles.replyModalContent}>
           <View style={styles.modalHandle} />
@@ -372,42 +373,40 @@ const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
 
 const styles = StyleSheet.create({
   commentContainer: {
-    marginBottom: 12,
-    padding: 10,
+    marginBottom: 0,
+    padding: 5,
   },
-
   commentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 0,
   },
-
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 5,
   },
-
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: -10,
+    paddingHorizontal: -10,
+  },
   profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#f0f0f0',
+    width: 35,
+    height: 35,
+    borderRadius: 50,
+    marginRight: 5,
   },
-
   username: {
-    fontFamily: 'Inter',
     fontWeight: '600',
     fontSize: 13,
     color: '#1a1a1a',
   },
-
   time: {
-    color: '#8e8e8e',
+    color: '#101010ff',
     fontSize: 13,
-    fontFamily: 'Inter',
     marginLeft: 6,
   },
 
@@ -431,63 +430,52 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     top: -10,
   },
-
   footerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
   },
-
   likes: {
     fontSize: 13,
     color: '#666',
-    fontFamily: 'Inter',
     fontWeight: '500',
   },
-
   replyButton: {
     color: 'gray',
     fontSize: 12,
-    fontFamily: 'Inter',
     fontWeight: '600',
   },
-
   replyContainer: {
     marginLeft: 5,
     marginTop: 10,
   },
-
   replyLine: {
     position: 'absolute',
-    left: 20,
+    left: 10,
     top: 0,
     bottom: 0,
     width: 1.5,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#009dffff',
   },
   replyContent: {
     flexDirection: 'row',
-    paddingLeft: 38,
+    paddingLeft: 20,
     marginTop: 8,
   },
   replyProfileImage: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#f0f0f0',
+    width: 35,
+    height: 35,
+    borderRadius: 50,
   },
   replyTextContainer: {
     marginLeft: 10,
     flex: 1,
   },
   replyUsername: {
-    fontFamily: 'Inter',
     fontWeight: '600',
     fontSize: 14,
     color: '#1a1a1a',
   },
-
   replyText: {
     fontSize: 13,
     color: '#2c2c2c',
@@ -501,7 +489,6 @@ const styles = StyleSheet.create({
     padding: 14,
     paddingRight: 45,
     fontSize: 14,
-    fontFamily: 'Inter',
     marginTop: 12,
     borderWidth: 1,
     borderColor: '#f0f0f0',
@@ -519,7 +506,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    height: '95%',
+    height: '55%',
   },
   modalContent: {
     flex: 1,
@@ -531,7 +518,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-
   commentsList: {
     flex: 1,
   },
@@ -540,32 +526,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
   },
-
   commentsListContent: {
     paddingHorizontal: 15,
   },
-
   inputContainer: {
     padding: 15,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
     backgroundColor: 'white',
   },
-
   commentCount: {
-    fontWeight: '600',
+    color: 'black',
     textAlign: 'center',
-    fontFamily: 'Inter',
     fontSize: 13,
     marginTop: 5,
     marginBottom: 10,
   },
-
   modal: {
     margin: 0,
     justifyContent: 'flex-end',
   },
-
   modalHandle: {
     width: 36,
     height: 4,
@@ -587,7 +567,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'Inter',
   },
   emptyContainer: {
     flex: 1,
@@ -596,14 +575,12 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyText: {
-    fontFamily: 'Inter',
     fontSize: 16,
     color: '#666',
     marginBottom: 8,
     fontWeight: '800',
   },
   emptySubText: {
-    fontFamily: 'Inter',
     fontSize: 14,
     color: '#999',
   },
@@ -620,20 +597,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-
   replyInput: {
     backgroundColor: '#f8f8f8',
     borderRadius: 24,
     padding: 14,
     paddingRight: 45,
     fontSize: 14,
-    fontFamily: 'Inter',
     marginTop: 12,
     borderWidth: 1,
     borderColor: '#f0f0f0',
     maxHeight: 100,
   },
-
   sendButtonDisabled: {
     backgroundColor: '#ccc',
   },

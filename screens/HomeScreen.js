@@ -12,8 +12,9 @@ import {
   Platform,
 } from 'react-native';
 import { TabView } from 'react-native-tab-view';
-import HomeNavigationBar from '../navigation/HomeNavigationBar';
+import HomeNavigationBar from '../navigation/home/HomeNavigationBar';
 import PostScreen from '../components/post/PostScreen';
+import { Subtitle, Title } from '../components/ui/Typography';
 
 const { width } = Dimensions.get('window');
 const NAVBAR_HEIGHT = 60;
@@ -43,9 +44,9 @@ const MemoTabBar = memo(({ index, setIndex, routes }) => (
           onPress={() => setIndex(i)}
           activeOpacity={0.8}
         >
-          <Text style={[styles.tabText, isFocused && styles.tabTextActive]}>
+          <Subtitle style={[styles.tabText, isFocused && styles.tabTextActive]}>
             {route.title}
-          </Text>
+          </Subtitle>
         </TouchableOpacity>
       );
     })}
@@ -67,9 +68,9 @@ export default function HomeScreen() {
       default:
         return (
           <View style={styles.emptyTab}>
-            <Text style={{ color: '#aaa', fontSize: 16 }}>
+            <Subtitle style={{ color: '#aaa', fontSize: 16 }}>
               No content for "{route.title}"
-            </Text>
+            </Subtitle>
           </View>
         );
     }
@@ -144,12 +145,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#555',
   },
   tabTextActive: {
-    fontWeight: 'bold',
     color: '#fff',
+
   },
   emptyTab: {
     flex: 1,

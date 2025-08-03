@@ -104,7 +104,7 @@ export default function CaptionScreen({ route }) {
                         onPress: () => {
                             navigation.reset({
                                 index: 0,
-                                routes: [{ name: 'HomeScreen' }],
+                                routes: [{ name: 'home' }],
                             });
                         },
                     },

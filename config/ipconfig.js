@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.204.156:8000/";
+const BASE_URL = "http://192.168.148.156:8000/";
 
 
 // https://cnexi.com

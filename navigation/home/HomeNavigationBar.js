@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AlarmIcon from '../components/icons/AlarmIcon';
-import AddIcon from '../components/icons/AddIcon';
+import AlarmIcon from '../../components/icons/AlarmIcon';
+import AddIcon from '../../components/icons/AddIcon';
 
 const { width } = Dimensions.get('window');
 
@@ -14,7 +14,7 @@ export default function HomeNavigationBar() {
       <View style={styles.menuBar}>
         <View style={styles.leftSection}>
           <Image
-            source={require('../assets/img/app/CnexiBlue.png')}
+            source={require('../../assets/img/app/CnexiBlue.png')}
             style={styles.logo}
             resizeMode="contain"
           />

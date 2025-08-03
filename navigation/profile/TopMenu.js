@@ -14,8 +14,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import ipconfig from '../config/ipconfig';
-import AddIcon from '../components/icons/AddIcon';
+import ipconfig from '../../config/ipconfig';
+import AddIcon from '../../components/icons/AddIcon';
+import { Title } from '../../components/ui/Typography';
 
 const { width } = Dimensions.get('window');
 
@@ -64,11 +65,11 @@ const TopMenu = () => {
         {loading ? (
           <ActivityIndicator size="small" color="#555" style={styles.title} />
         ) : (
-          <Text style={styles.title}>
+          <Title style={styles.title}>
             {profileData?.name?.length > 18
               ? profileData.name.slice(0, 18) + '...'
               : profileData?.name || '...'}
-          </Text>
+          </Title>
         )}
 
         <View style={styles.rightIcons}>
@@ -109,9 +110,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    fontSize: width * 0.045,
-    fontFamily: 'Manrope',
-    color: '#000',
+    fontSize: width * 0.050,
+    color: '#272727ff',
   },
 
   rightIcons: {

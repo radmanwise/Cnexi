@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import TopMenu from '../navigation/TopMenu';
+import TopMenu from '../navigation/profile/TopMenu';
 import FollowButton from '../components/buttons/FollowButton';
 import PostList from '../components/post/PostList';
 import axios from 'axios';

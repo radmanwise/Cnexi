@@ -6,7 +6,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Animated } from 'react-native';
 import FastImage from 'expo-fast-image';
 import CommentButton from '../buttons/CommentButton';
-import CaptionWithMore from './CaptionWithMore';
+import CaptionWithMore from './caption/CaptionWithMore';
 import LikeButton from '../buttons/LikeButton';
 import SaveButton from '../buttons/SaveButton';
 import PostMenu from './PostMenu';
@@ -21,13 +21,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  RefreshControl
 } from 'react-native';
 
 
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POST_HEIGHT = SCREEN_HEIGHT * 0.50;
-const PROFILE_IMAGE_SIZE = 30;
+const PROFILE_IMAGE_SIZE = 35;
 
 const PostScreen = ({ filter, scrollY }) => {
 
@@ -293,8 +294,17 @@ const PostScreen = ({ filter, scrollY }) => {
       }}
       onEndReached={loadMorePosts}
       onEndReachedThreshold={0.5}
-      refreshing={state.refreshing}
-      onRefresh={onRefresh}
+      refreshControl={
+        <RefreshControl
+          refreshing={state.refreshing}
+          onRefresh={onRefresh}
+          progressViewOffset={150}
+          colors={['#000000ff']} 
+          tintColor="#000000ff"  
+          progressBackgroundColor="#ffffffff"
+        />
+      }
+
       scrollEventThrottle={16}
       initialNumToRender={5}
       maxToRenderPerBatch={5}
@@ -302,7 +312,7 @@ const PostScreen = ({ filter, scrollY }) => {
       removeClippedSubviews={true}
       showsVerticalScrollIndicator={false}
       scrollEnabled={!state.isModalVisible}
-      contentContainerStyle={{ paddingTop: 140 }}
+      contentContainerStyle={{ paddingTop: 140, zIndex: 1 }}
       onScroll={scrollY
         ? Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],

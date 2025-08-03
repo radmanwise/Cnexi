@@ -1,22 +1,20 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Feather, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import EllipsisVerticalIcon from '../../components/icons/EllipsisVerticalIcon';
-import UserRoundXIcon from '../../components/icons/UserRoundXIcon';
-import * as Font from 'expo-font';
-import { BlurView } from 'expo-blur';
-import { Easing } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   Modal,
-  StyleSheet,
+  Animated,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Animated,
-  Dimensions,
-  Platform,
+  Easing,
   useColorScheme,
+  Dimensions,
+  StyleSheet
 } from 'react-native';
+
+import { Feather } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { UserRoundXIcon, EllipsisVerticalIcon } from 'lucide-react-native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -28,72 +26,56 @@ const PostMenu = ({
   onHidePost,
   onUnfollow,
   onAddToFavorites,
-  style
+  style,
 }) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
+  const [visible, setVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const theme = useColorScheme();
 
-  useEffect(() => {
-    Font.loadAsync({
-      'Manrope': require('../../assets/fonts/Manrope/Manrope-Medium.ttf'),
-    }).then(() => setFontsLoaded(true));
+  const open = useCallback(() => setVisible(true), []);
+  const close = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.poly(4)),
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.out(Easing.poly(4)),
+        useNativeDriver: true,
+      }),
+    ]).start(() => setVisible(false));
   }, []);
 
   useEffect(() => {
     Animated.parallel([
       Animated.spring(slideAnim, {
-        toValue: modalVisible ? 1 : 0,
+        toValue: visible ? 1 : 0,
         useNativeDriver: true,
-        tension: 60,
-        friction: 12,
       }),
       Animated.timing(fadeAnim, {
-        toValue: modalVisible ? 1 : 0,
-        duration: modalVisible ? 200 : 150,
-        easing: Easing.out(Easing.poly(4)),
+        toValue: visible ? 1 : 0,
+        duration: visible ? 250 : 200,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [modalVisible]);
+  }, [visible]);
 
   const translateY = slideAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [SCREEN_HEIGHT, 0],
   });
 
-  const openModal = useCallback(() => setModalVisible(true), []);
-
-  const closeModal = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 400, 
-        easing: Easing.out(Easing.poly(4)),
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.out(Easing.poly(4)),
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setModalVisible(false);
-    });
-  }, []);
-
-
-
-  const handleOptionPress = useCallback((callback) => {
+  const handleOptionPress = (callback) => {
     if (callback) callback();
-    closeModal();
-  }, [closeModal]);
+    close();
+  };
 
-  const renderOption = useCallback((label, callback, {
+  const renderOption = (label, callback, {
     icon,
     dangerous = false,
     textStyle = {},
@@ -107,21 +89,19 @@ const PostMenu = ({
       {icon && <View style={styles.optionIconContainer}>{icon(iconColor)}</View>}
       <Text style={[
         styles.optionText,
-        { color: dangerous ? '#FF3B30' : (theme === 'dark' ? '#F5F5F5' : '#262626') },
+        { color: dangerous ? '#FF3B30' : (theme === 'dark' ? '#F5F5F5' : '#000000ff') },
         textStyle
       ]}>
         {label}
       </Text>
     </TouchableOpacity>
-  ), [handleOptionPress, theme]);
-
-  if (!fontsLoaded) return null;
+  );
 
   return (
     <>
       <TouchableOpacity
         style={[styles.menuButton, style]}
-        onPress={openModal}
+        onPress={open}
         activeOpacity={0.7}
       >
         <EllipsisVerticalIcon size={21} color={theme === 'dark' ? '#CCC' : '#777'} />
@@ -129,20 +109,20 @@ const PostMenu = ({
 
       <Modal
         transparent
-        visible={modalVisible}
+        visible={visible}
         animationType="none"
-        onRequestClose={closeModal}
+        onRequestClose={close}
         statusBarTranslucent
       >
         <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
-          <TouchableWithoutFeedback onPress={closeModal}>
+          <TouchableWithoutFeedback onPress={close}>
             <View style={styles.overlayTouch}>
               <TouchableWithoutFeedback>
                 <Animated.View style={[
                   styles.modalContainer,
                   {
                     transform: [{ translateY }],
-                    backgroundColor: theme === 'dark' ? '#1C1C1E' : '#F9F9F9'
+                    backgroundColor: theme === 'dark' ? '#1C1C1E' : '#F9F9F9',
                   }
                 ]}>
                   <View style={styles.header}>
@@ -153,38 +133,48 @@ const PostMenu = ({
                     <View style={styles.optionGroup}>
                       {isOwnPost ? (
                         <>
-                          {renderOption('Edit', onEditPost, { icon: (color) => <Feather name="edit" size={22} color={color} /> })}
-                          {renderOption('Archive', () => { }, { icon: (color) => <MaterialCommunityIcons name="archive-outline" size={22} color={color} /> })}
-                          {renderOption('Hide like count', () => { }, { icon: (color) => <Feather name="eye-off" size={22} color={color} /> })}
-                          {renderOption('Turn off commenting', () => { }, { icon: (color) => <MaterialCommunityIcons name="comment-off-outline" size={22} color={color} /> })}
+                          {renderOption('Edit', onEditPost, {
+                            icon: (color) => <Feather name="edit" size={22} color={color} />,
+                          })}
+                          {renderOption('Delete', onDeletePost, {
+                            dangerous: true,
+                            icon: (color) => <MaterialCommunityIcons name="delete-outline" size={22} color={color} />,
+                            textStyle: styles.boldText,
+                          })}
                         </>
                       ) : (
                         <>
-                          {renderOption('Add to favorites', onAddToFavorites, { icon: (color) => <MaterialIcons name="stars" size={22} color={color} /> })}
-                          {renderOption('Hide', onHidePost, { icon: (color) => <Feather name="eye-off" size={22} color={color} /> })}
-                          {renderOption('Unfollow', onUnfollow, { icon: (color) => <UserRoundXIcon size={22} color={color} /> })}
+                          {renderOption('Add to favorites', onAddToFavorites, {
+                            icon: (color) => <MaterialIcons name="stars" size={22} color={color} />,
+                          })}
+                          {renderOption('Hide', onHidePost, {
+                            icon: (color) => <Feather name="eye-off" size={22} color={color} />,
+                          })}
+                          {renderOption('Unfollow', onUnfollow, {
+                            icon: (color) => <UserRoundXIcon size={22} color={color} />,
+                          })}
                         </>
                       )}
                     </View>
 
                     <View style={styles.optionGroup}>
-                      {renderOption('Share', () => { }, { icon: (color) => <Feather name="share" size={22} color={color} /> })}
-                      {renderOption('Copy link', () => { }, { icon: (color) => <Feather name="link" size={22} color={color} /> })}
+                      {renderOption('Share', () => { }, {
+                        icon: (color) => <Feather name="share" size={22} color={color} />,
+                      })}
+                      {renderOption('Copy link', () => { }, {
+                        icon: (color) => <Feather name="link" size={22} color={color} />,
+                      })}
                     </View>
 
-                    <View style={styles.optionGroup}>
-                      {isOwnPost
-                        ? renderOption('Delete', onDeletePost, {
-                          dangerous: true,
-                          icon: (color) => <MaterialCommunityIcons name="delete-outline" size={22} color={color} />,
-                          textStyle: styles.boldText
-                        })
-                        : renderOption('Report', onReportPost, {
+                    {!isOwnPost && (
+                      <View style={styles.optionGroup}>
+                        {renderOption('Report', onReportPost, {
                           dangerous: true,
                           icon: () => <MaterialCommunityIcons name="alert-circle-outline" size={22} color="#FF3B30" />,
-                          textStyle: styles.boldText
+                          textStyle: styles.boldText,
                         })}
-                    </View>
+                      </View>
+                    )}
                   </View>
                 </Animated.View>
               </TouchableWithoutFeedback>
@@ -196,16 +186,15 @@ const PostMenu = ({
   );
 };
 
+export default PostMenu;
+
 const styles = StyleSheet.create({
   menuButton: {
-    padding: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
+    padding: 6,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(4, 4, 4, 0.44)',
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
     justifyContent: 'flex-end',
   },
   overlayTouch: {
@@ -215,56 +204,45 @@ const styles = StyleSheet.create({
   modalContainer: {
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    paddingBottom: Platform.select({ ios: 44, android: 24 }),
+    paddingBottom: 20,
+    paddingTop: 8,
+    paddingHorizontal: 18,
   },
   header: {
     alignItems: 'center',
-    paddingVertical: 12,
-    position: 'relative',
+    marginBottom: 8,
   },
   indicator: {
-    width: 36,
+    width: 40,
     height: 5,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#999',
     borderRadius: 3,
   },
-  closeIcon: {
-    position: 'absolute',
-    right: 16,
-    top: 4,
-  },
   content: {
-    paddingTop: 8,
+    gap: 16,
   },
   optionGroup: {
-    marginBottom: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    marginHorizontal: 8,
-    overflow: 'hidden',
+    gap: 8,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: Platform.select({ ios: 16, android: 14 }),
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+  },
+  dangerousOption: {
+    backgroundColor: 'rgba(255, 59, 48, 0.05)',
   },
   optionIconContainer: {
-    width: 32,
-    marginRight: 12,
+    width: 30,
     alignItems: 'center',
   },
   optionText: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: 'Manrope',
-  },
-  dangerousOption: {
-    backgroundColor: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'Manrope', 
   },
   boldText: {
     fontWeight: '600',
   },
 });
-
-export default PostMenu;

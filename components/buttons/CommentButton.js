@@ -265,7 +265,7 @@ const CommentsButton = ({ postId, iconSize = 24, iconColor = '#000' }) => {
         swipeDirection={['down']}
         style={styles.modal}
         backdropOpacity={0.5}
-        statusBarTranslucent={true}
+        statusBarTranslucent={false}
         avoidKeyboard={true}
         propagateSwipe={true}
         animationIn="slideInUp"

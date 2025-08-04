@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Animated } from 'react-native';
 import FastImage from 'expo-fast-image';
 import CommentButton from '../buttons/CommentButton';
 import CaptionWithMore from './caption/CaptionWithMore';
@@ -12,26 +11,35 @@ import SaveButton from '../buttons/SaveButton';
 import PostMenu from './PostMenu';
 import ipconfig from '../../config/ipconfig';
 import BadgeCheck from '../icons/BadgeCheck';
-import * as Font from 'expo-font';
+import ZoomMediaModal from './ZoomMediaModal';
+import Maximize2Icon from '../icons/Maximize2Icon';
 import {
   View,
   Text,
   FlatList,
-  Image,
   TouchableWithoutFeedback,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  RefreshControl
+  RefreshControl,
+  Animated
 } from 'react-native';
-
 
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POST_HEIGHT = SCREEN_HEIGHT * 0.50;
 const PROFILE_IMAGE_SIZE = 35;
 
+
 const PostScreen = ({ filter, scrollY }) => {
+  const videoRefs = useRef([]);
+  const navigation = useNavigation();
+  const [showZoomButtonIndex, setShowZoomButtonIndex] = useState(null);
+  const zoomButtonOpacity = useRef(new Animated.Value(1)).current;
+  const zoomButtonTimeout = useRef(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMedia, setModalMedia] = useState(null);
+  const [activeSlides, setActiveSlides] = useState({});
 
   const [state, setState] = useState({
     posts: [],
@@ -40,12 +48,69 @@ const PostScreen = ({ filter, scrollY }) => {
     page: 1,
     hasNextPage: true,
     isPlaying: {},
-    isModalVisible: false
+    isModalVisible: false,
   });
 
+  const clearZoomTimeout = () => {
+    if (zoomButtonTimeout.current) {
+      clearTimeout(zoomButtonTimeout.current);
+      zoomButtonTimeout.current = null;
+    }
+  };
 
-  const videoRefs = useRef([]);
-  const navigation = useNavigation();
+  const startHideZoomTimer = () => {
+    clearZoomTimeout();
+    zoomButtonTimeout.current = setTimeout(() => {
+      Animated.timing(zoomButtonOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowZoomButtonIndex(null));
+    }, 50000);
+  };
+
+  const showZoomButton = (index) => {
+    setShowZoomButtonIndex(index);
+    Animated.timing(zoomButtonOpacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    startHideZoomTimer();
+  };
+
+  const handleVideoPress = useCallback((index) => {
+    setState((prev) => {
+      const newIsPlaying = !prev.isPlaying[index];
+      if (newIsPlaying) {
+        showZoomButton(index);
+        videoRefs.current[index]?.playAsync();
+      } else {
+        videoRefs.current[index]?.pauseAsync();
+      }
+      return {
+        ...prev,
+        isPlaying: { ...prev.isPlaying, [index]: newIsPlaying },
+      };
+    });
+  }, []);
+
+  const handlePostChange = useCallback((index) => {
+    setState(prev => {
+      const updatedPlayingState = {};
+      prev.posts.forEach((_, i) => {
+        updatedPlayingState[i] = false;
+        videoRefs.current[i]?.pauseAsync();
+      });
+      return {
+        ...prev,
+        isPlaying: { ...updatedPlayingState, [index]: true }
+      };
+    });
+    videoRefs.current[index]?.playAsync();
+  }, []);
+
 
   const fetchPosts = useCallback(async (pageToFetch = 1, shouldRefresh = false) => {
     try {
@@ -73,36 +138,11 @@ const PostScreen = ({ filter, scrollY }) => {
   }, []);
 
 
-  const handlePostChange = useCallback((index) => {
-    setState(prev => {
-      const updatedPlayingState = {};
-      prev.posts.forEach((_, i) => {
-        updatedPlayingState[i] = false;
-        videoRefs.current[i]?.pauseAsync();
-      });
-      return {
-        ...prev,
-        isPlaying: { ...updatedPlayingState, [index]: true }
-      };
-    });
-    videoRefs.current[index]?.playAsync();
-  }, []);
-
-  const handleVideoPress = useCallback((index) => {
-    setState(prev => {
-      const newIsPlaying = !prev.isPlaying[index];
-      videoRefs.current[index]?.[newIsPlaying ? 'playAsync' : 'pauseAsync']();
-      return {
-        ...prev,
-        isPlaying: { ...prev.isPlaying, [index]: newIsPlaying }
-      };
-    });
-  }, []);
-
   const onRefresh = useCallback(() => {
     setState(prev => ({ ...prev, refreshing: true }));
     fetchPosts(1, true);
   }, [fetchPosts]);
+
 
   const loadMorePosts = useCallback(() => {
     const { loading, hasNextPage, page } = state;
@@ -110,6 +150,7 @@ const PostScreen = ({ filter, scrollY }) => {
       fetchPosts(page + 1);
     }
   }, [state, fetchPosts]);
+
 
   const truncateText = useMemo(() => (str, maxLength) =>
     str?.length > maxLength ? `${str.substring(0, maxLength)}...` : str,
@@ -139,7 +180,6 @@ const PostScreen = ({ filter, scrollY }) => {
     </View>
   ), [navigation, truncateText]);
 
-  const [activeSlides, setActiveSlides] = useState({});
 
 
   const renderMediaContent = useCallback(({ item, index }) => {
@@ -165,12 +205,15 @@ const PostScreen = ({ filter, scrollY }) => {
             renderItem={({ item: file }) => (
               <View style={styles.slideContainer}>
                 {file.file.endsWith('.mp4') ? (
-                  <TouchableWithoutFeedback onPress={() => handleVideoPress(index)}>
+                  <TouchableWithoutFeedback onPress={() => {
+                    setModalMedia({ type: 'video', uri: file.file });
+                    setModalVisible(true);
+                  }}>
                     <Video
                       ref={ref => videoRefs.current[index] = ref}
                       source={{ uri: file?.file ?? '' }}
                       style={styles.mediaContent}
-                      resizeMode="contain"
+                      resizeMode="cover"
                       isLooping
                       isMuted={!state.isPlaying[index]}
                       useNativeControls={false}
@@ -178,12 +221,17 @@ const PostScreen = ({ filter, scrollY }) => {
                     />
                   </TouchableWithoutFeedback>
                 ) : (
-                  <FastImage
-                    style={styles.mediaContent}
-                    source={{ uri: file.file }}
-                    resizeMode={FastImage.resizeMode}
-                    cache="web"
-                  />
+                  <TouchableWithoutFeedback onPress={() => {
+                    setModalMedia({ type: 'image', uri: file.file });
+                    setModalVisible(true);
+                  }}>
+                    <FastImage
+                      style={styles.mediaContent}
+                      source={{ uri: file.file }}
+                      cache="web"
+                      resizeMode="cover"
+                    />
+                  </TouchableWithoutFeedback>
                 )}
               </View>
             )}
@@ -195,7 +243,7 @@ const PostScreen = ({ filter, scrollY }) => {
                 key={dotIndex}
                 style={[
                   styles.dot,
-                  { backgroundColor: dotIndex === (activeSlides[item.id] || 0) ? '#fff' : '#ffffff80' }
+                  { backgroundColor: dotIndex === (activeSlides[item.id] || 0) ? '#000' : '#ffffffff' }
                 ]}
               />
             ))}
@@ -204,32 +252,57 @@ const PostScreen = ({ filter, scrollY }) => {
       );
     }
 
+
     return (
       <View style={styles.mediaContainer}>
         {item.files?.[0]?.file?.endsWith('.mp4') ? (
-          <TouchableWithoutFeedback onPress={() => handleVideoPress(index)}>
-            <Video
-              ref={ref => videoRefs.current[index] = ref}
-              source={{ uri: item.files[0].file }}
+          <>
+            <TouchableWithoutFeedback onPress={() => handleVideoPress(index)}>
+              <Video
+                ref={(ref) => (videoRefs.current[index] = ref)}
+                source={{ uri: item.files[0].file }}
+                style={styles.mediaContent}
+                resizeMode="cover"
+                isLooping
+                isMuted={!state.isPlaying[index]}
+                useNativeControls={false}
+                shouldPlay={state.isPlaying[index]}
+              />
+            </TouchableWithoutFeedback>
+
+            {showZoomButtonIndex === index && (
+              <Animated.View style={[styles.videoZoomButton, { opacity: zoomButtonOpacity }]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalMedia({ type: 'video', uri: item.files[0].file });
+                    setModalVisible(true);
+                  }}
+                >
+                  <Maximize2Icon size={17} color="white" />
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+          </>
+        ) : (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setModalMedia({ type: 'image', uri: item.files[0].file });
+              setModalVisible(true);
+            }}
+          >
+            <FastImage
               style={styles.mediaContent}
-              resizeMode="cover"
-              isLooping
-              isMuted={!state.isPlaying[index]}
-              useNativeControls={false}
-              shouldPlay={state.isPlaying[index]}
+              source={{ uri: item.files[0].file }}
+              resizeMode={FastImage.resizeMode}
+              cache="web"
             />
           </TouchableWithoutFeedback>
-        ) : (
-          <FastImage
-            style={styles.mediaContent}
-            source={{ uri: item.files[0].file }}
-            resizeMode={FastImage.resizeMode}
-            cache="web"
-          />
         )}
       </View>
     );
-  }, [handleVideoPress, state.isPlaying, activeSlides]);
+  },
+    [handleVideoPress, state.isPlaying, showZoomButtonIndex, zoomButtonOpacity]
+  );
 
   const renderItem = useCallback(({ item, index }) => (
     <View style={styles.postContainer} onStartShouldSetResponder={() => true}>
@@ -282,47 +355,82 @@ const PostScreen = ({ filter, scrollY }) => {
     }, [])
   );
 
+  useEffect(() => {
+    if (modalVisible) {
+      videoRefs.current.forEach((videoRef) => {
+        if (videoRef && videoRef.pauseAsync) {
+          videoRef.pauseAsync();
+        }
+      });
+      setState((prev) => ({
+        ...prev,
+        isPlaying: {},
+      }));
+    }
+  }, [modalVisible]);
 
-  return (
-    <Animated.FlatList
-      data={state.posts}
-      keyExtractor={item => item.id.toString()}
-      renderItem={renderItem}
-      onMomentumScrollEnd={event => {
-        const index = Math.floor(event.nativeEvent.contentOffset.y / 400);
-        handlePostChange(index);
-      }}
-      onEndReached={loadMorePosts}
-      onEndReachedThreshold={0.5}
-      refreshControl={
-        <RefreshControl
-          refreshing={state.refreshing}
-          onRefresh={onRefresh}
-          progressViewOffset={150}
-          colors={['#000000ff']}
-          tintColor="#000000ff"
-          progressBackgroundColor="#ffffffff"
-        />
+
+  const onScrollHandler = useCallback(
+    (event) => {
+      if (showZoomButtonIndex !== null) {
+        showZoomButton(showZoomButtonIndex);
       }
 
-      scrollEventThrottle={16}
-      initialNumToRender={5}
-      maxToRenderPerBatch={5}
-      windowSize={5}
-      removeClippedSubviews={true}
-      showsVerticalScrollIndicator={false}
-      scrollEnabled={!state.isModalVisible}
-      contentContainerStyle={{ paddingTop: 140, zIndex: 1 }}
-      onScroll={scrollY
-        ? Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )
-        : null}
-    />
+      if (scrollY) {
+        scrollY.setValue(event.nativeEvent.contentOffset.y);
+      }
+    },
+    [showZoomButtonIndex, scrollY]
   );
 
+  return (
+    <>
+      <Animated.FlatList
+        data={state.posts}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
+        onMomentumScrollEnd={event => {
+          const index = Math.floor(event.nativeEvent.contentOffset.y / 400);
+          handlePostChange(index);
+        }}
+        onEndReached={loadMorePosts}
+        onEndReachedThreshold={0.5}
+        refreshControl={
+          <RefreshControl
+            refreshing={state.refreshing}
+            onRefresh={onRefresh}
+            progressViewOffset={150}
+            colors={['#000000ff']}
+            tintColor="#000000ff"
+            progressBackgroundColor="#ffffffff"
+          />
+        }
+        scrollEventThrottle={16}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews={true}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={!state.isModalVisible}
+        contentContainerStyle={{ paddingTop: 140, zIndex: 1 }}
+        onScroll={
+          scrollY
+            ? Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: true }
+            )
+            : null
+        }
+      />
+      <ZoomMediaModal
+        visible={modalVisible}
+        media={modalMedia}
+        onClose={() => setModalVisible(false)}
+      />
+    </>
+  );
 };
+
 
 const styles = StyleSheet.create({
   postContainer: {
@@ -331,7 +439,6 @@ const styles = StyleSheet.create({
     borderTopColor: '#ffff',
     borderBottomColor: "#E0E0E0",
     borderBottomWidth: 0.5,
-
   },
   header: {
     padding: 10,
@@ -370,22 +477,64 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     left: 8,
   },
-  slideContainer: {
-    width: SCREEN_WIDTH,
-    height: POST_HEIGHT,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffff',
-    borderWidth: 0.3,
-    borderColor: 'gray'
-  },
   mediaContent: {
-    width: '100%',
+    width: '120%',
     height: '100%',
-    backgroundColor: '#ffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12
+    aspectRatio: 4 / 4,
+    borderRadius: 12,
+    backgroundColor: '#e2e2e2e8',
+    alignSelf: 'center',
+  },
+  videoZoomButton: {
+    position: 'absolute',
+    bottom: 15,
+    right: 345,
+    backgroundColor: '#00000088',
+    borderRadius: 50,
+    padding: 7,
+  },
+
+
+
+  // mediaContent: {
+  //   width: '100%',
+  //   height: '100%',
+  //   backgroundColor: '#ffff',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   borderRadius: 12
+  // },
+  // videoZoomButton: {
+  //   position: 'absolute',
+  //   bottom: 15,
+  //   right: 345,
+  //   backgroundColor: '#00000088',
+  //   borderRadius: 50,
+  //   padding: 7,
+  // },
+  // slideContainer: {
+  //   width: SCREEN_WIDTH,
+  //   height: POST_HEIGHT,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   backgroundColor: '#ffff',
+  //   borderWidth: 0.3,
+  //   borderColor: 'gray'
+  // },
+
+
+
+
+
+
+
+  slideContainer: {
+    width: SCREEN_WIDTH * 0.95, // بهتره کمی کمتر از عرض کل باشه
+    height: POST_HEIGHT,
+    overflow: 'hidden', // 👈 جلوگیری از بیرون زدن تصویر
+    borderRadius: 12,
+    backgroundColor: '#000', // کمک به تمیزی لبه‌ها
+    alignSelf: 'center',
   },
   paginationDots: {
     flexDirection: 'row',
@@ -434,11 +583,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     fontFamily: 'Manrope',
   },
-  captionUsername: {
-    fontSize: 13,
-    marginRight: 8,
-    fontFamily: 'Manrope',
-  },
   date: {
     fontSize: 11,
     color: '#929292ff',
@@ -446,44 +590,6 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
     fontFamily: 'Manrope',
   },
-  suggestionBox: {
-    margin: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 0.5,
-    borderColor: '#dbdbdb',
-  },
-  suggestionContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#f8f8f8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  iconText: {
-    fontSize: 24,
-  },
-  suggestionTitle: {
-    fontFamily: 'Manrope',
-    fontSize: 14,
-    color: '#262626',
-    marginBottom: 4,
-  },
-  suggestionSubtitle: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    color: '#0095f6',
-    fontWeight: '600',
-  },
-
 });
 
 export default PostScreen;

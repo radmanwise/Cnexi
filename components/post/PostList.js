@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
   postContainer: {
     width: itemSize,
     height: itemSize,
+    top: 2
   },
   mediaContainer: {
     flex: 1,
@@ -217,8 +218,8 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    borderBottomColor: '#eeeeeece',
-    borderBottomWidth: 1,
+    borderBottomColor: '#dcd9d9ff',
+    borderBottomWidth: 0.2,
     justifyContent: 'space-around',
     paddingHorizontal: 10,
   },
@@ -236,10 +237,11 @@ const styles = StyleSheet.create({
   },
   indicator: {
     marginTop: 13,
-    height: 2,
-    width: '95%',
+    height: 1,
+    width: '110%',
     backgroundColor: '#1c1c1cff',
     borderRadius: 15,
+    left: -5
   },
 });
 

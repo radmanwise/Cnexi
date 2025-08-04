@@ -1,24 +1,20 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-const ClapperboardIcon = ({ size = 24, color = 'currentColor' }) => {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <Path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z" />
-      <Path d="m6.2 5.3 3.1 3.9" />
-      <Path d="m12.4 3.4 3.1 4" />
-      <Path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
-    </Svg>
-  );
-};
+const SpoolIcon = ({ size = 24, color = 'black' }) => (
+  <Svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <Path d="M17 13.44 4.442 17.082A2 2 0 0 0 4.982 21H19a2 2 0 0 0 .558-3.921l-1.115-.32A2 2 0 0 1 17 14.837V7.66" />
+    <Path d="m7 10.56 12.558-3.642A2 2 0 0 0 19.018 3H5a2 2 0 0 0-.558 3.921l1.115.32A2 2 0 0 1 7 9.163v7.178" />
+  </Svg>
+);
 
-export default ClapperboardIcon;
+export default SpoolIcon;

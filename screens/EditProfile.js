@@ -16,6 +16,7 @@ import ipconfig from '../config/ipconfig';
 import * as SecureStore from 'expo-secure-store';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, Feather, AntDesign } from '@expo/vector-icons';
+import { Title, Subtitle } from '../components/ui/Typography'
 
 const THEME_COLORS = {
     primary: '#fe2c55',
@@ -227,7 +228,7 @@ const EditProfile = ({ route }) => {
                     </View>
                 </View>
 
-                <Text style={styles.sectionTitle}>Basic Info</Text>
+                <Title style={styles.sectionTitle}>Basic Info</Title>
                 <View style={styles.formSection}>
                     <View style={styles.inputGroup}>
                         <Text style={styles.inputLabel}>Name</Text>
@@ -494,7 +495,6 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: '600',
         color: THEME_COLORS.text,
         marginTop: 24,
         marginBottom: 16,

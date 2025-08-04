@@ -17,6 +17,7 @@ import * as SecureStore from 'expo-secure-store';
 import ipconfig from '../../config/ipconfig';
 import AddIcon from '../../components/icons/AddIcon';
 import { Title } from '../../components/ui/Typography';
+import SettingsMenuIcon from '../../components/icons/SettingsMenuIcon';
 
 const { width } = Dimensions.get('window');
 
@@ -78,7 +79,7 @@ const TopMenu = () => {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconButton}>
-            <Feather name="menu" size={25} color="#000" />
+            <SettingsMenuIcon size={25} color="#1e1e1eff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -89,7 +90,7 @@ const TopMenu = () => {
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: '#fff',
-    top: 15
+    top: 25
   },
   topMenu: {
     flexDirection: 'row',
@@ -119,8 +120,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconButton: {
-    padding: 10,
-    marginLeft: 8,
+    padding: 8,
+    marginLeft: 9.2,
+    zIndex: 1,
   },
 });
 

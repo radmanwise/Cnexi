@@ -112,7 +112,7 @@ export default function ProfileScreen() {
     setTimeout(() => setIsModalVisible(false), 100);
   };
 
-  const MAX_BIO_LENGTH = 60;
+  const MAX_BIO_LENGTH = 50;
 
   const truncateText = (text, length) =>
     text.length > length ? text.substring(0, length) + '...' : text;
@@ -306,7 +306,7 @@ export default function ProfileScreen() {
 
           </View>
         </View>
-        <View style={{ bottom: 55 }}>
+        <View style={{ bottom: 140 }}>
           <PostList posts={profileData?.posts || []} />
         </View>
       </ScrollView>
@@ -370,7 +370,8 @@ const styles = StyleSheet.create({
   profileStatus: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: 16,
+    padding: 40,
+    top: -20,
     width: '100%',
   },
   profileInformation: {
@@ -391,21 +392,21 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   bioContainer: {
-    bottom: 25,
+    bottom: 55,
     maxWidth: 360,
-    padding: 16,
-    width: '100%',
-    left: -4
+    padding: 20,
+    width: '120%',
+    left:-19,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   biography: {
     fontSize: 13,
     fontFamily: 'Manrope',
-    lineHeight: 18,
-    color: 'black',
+    lineHeight: 25,
+    color: '#272727ff',
   },
-  seeMoreButton: {
-    marginTop: 5,
-  },
+
   seeMoreText: {
     color: '#666',
     fontSize: 12,

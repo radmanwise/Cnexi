@@ -19,7 +19,7 @@ import { MaterialIcons, Feather, AntDesign } from '@expo/vector-icons';
 import { Title, Subtitle } from '../components/ui/Typography'
 
 const THEME_COLORS = {
-    primary: '#fe2c55',
+    primary: '#070707ff',
     text: '#1a1a1a',
     textSecondary: '#666666',
     background: '#ffffff',
@@ -203,12 +203,12 @@ const EditProfile = ({ route }) => {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Edit Profile</Text>
+                <Title style={styles.headerTitle}>Edit Profile</Title>
                 <TouchableOpacity
                     style={styles.saveButton}
                     onPress={handleSubmit}
                 >
-                    <Text style={styles.saveButtonText}>Save</Text>
+                    <Title style={styles.saveButtonText}>Save</Title>
                 </TouchableOpacity>
             </View>
 
@@ -231,7 +231,7 @@ const EditProfile = ({ route }) => {
                 <Title style={styles.sectionTitle}>Basic Info</Title>
                 <View style={styles.formSection}>
                     <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Name</Text>
+                        <Title style={styles.inputLabel}>Name</Title>
                         <TextInput
                             style={styles.input}
                             value={formData.name}
@@ -243,7 +243,7 @@ const EditProfile = ({ route }) => {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Username</Text>
+                        <Title style={styles.inputLabel}>Username</Title>
                         <TextInput
                             style={styles.input}
                             value={formData.username_i}
@@ -255,7 +255,7 @@ const EditProfile = ({ route }) => {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Bio</Text>
+                        <Title style={styles.inputLabel}>Bio</Title>
                         <TextInput
                             style={[styles.input, styles.bioInput]}
                             value={formData.bio}
@@ -269,7 +269,7 @@ const EditProfile = ({ route }) => {
                     </View>
                 </View>
 
-                <Text style={styles.sectionTitle}>Additional Info</Text>
+                <Title style={styles.sectionTitle}>Additional Info</Title>
                 <View style={styles.formSection}>
                     <TouchableOpacity 
                         style={styles.optionItem}
@@ -280,11 +280,11 @@ const EditProfile = ({ route }) => {
                     >
                         <View style={styles.optionLeft}>
                             <Feather name="calendar" size={20} color="#666" />
-                            <Text style={styles.optionText}>Birthday</Text>
+                            <Title style={styles.optionText}>Birthday</Title>
                         </View>
-                        <Text style={styles.optionValue}>
+                        <Title style={styles.optionValue}>
                             {formatDate(formData.birthday)}
-                        </Text>
+                        </Title>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
@@ -293,7 +293,7 @@ const EditProfile = ({ route }) => {
                     >
                         <View style={styles.optionLeft}>
                             <Feather name="user" size={20} color="#666" />
-                            <Text style={styles.optionText}>Gender</Text>
+                            <Title style={styles.optionText}>Gender</Title>
                         </View>
                         <Text style={styles.optionValue}>
                             {formData.gender || 'Not set'}
@@ -303,20 +303,20 @@ const EditProfile = ({ route }) => {
                     <View style={styles.optionItem}>
                         <View style={styles.optionLeft}>
                             <Feather name="lock" size={20} color="#666" />
-                            <Text style={styles.optionText}>Private Account</Text>
+                            <Title style={styles.optionText}>Private Account</Title>
                         </View>
                         <Switch
                             value={formData.isPrivate}
                             onValueChange={(value) => 
                                 setFormData({ ...formData, isPrivate: value })
                             }
-                            trackColor={{ false: "#767577", true: "#fe2c55" }}
+                            trackColor={{ false: "#767577", true: "#000000ff" }}
                             thumbColor="#f4f3f4"
                         />
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Website</Text>
+                        <Title style={styles.inputLabel}>Website</Title>
                         <TextInput
                             style={styles.input}
                             value={formData.website}
@@ -335,7 +335,7 @@ const EditProfile = ({ route }) => {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Select Birthday</Text>
+                        <Title style={styles.modalTitle}>Select Birthday</Title>
                         <View style={styles.datePickerContainer}>
                             <TouchableOpacity 
                                 style={styles.dateArrow}
@@ -349,9 +349,9 @@ const EditProfile = ({ route }) => {
                             </TouchableOpacity>
                             
                             <View style={styles.dateDisplay}>
-                                <Text style={styles.dateText}>
+                                <Title style={styles.dateText}>
                                     {months[tempDate.getMonth()]} {tempDate.getDate()}, {tempDate.getFullYear()}
-                                </Text>
+                                </Title>
                             </View>
 
                             <TouchableOpacity 
@@ -371,7 +371,7 @@ const EditProfile = ({ route }) => {
                                 style={styles.modalButton}
                                 onPress={() => setShowDateModal(false)}
                             >
-                                <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+                                <Title style={styles.modalButtonTextCancel}>Cancel</Title>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.modalButtonConfirm]}
@@ -380,7 +380,7 @@ const EditProfile = ({ route }) => {
                                     setShowDateModal(false);
                                 }}
                             >
-                                <Text style={styles.modalButtonTextConfirm}>Confirm</Text>
+                                <Title style={styles.modalButtonTextConfirm}>Confirm</Title>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -394,7 +394,7 @@ const EditProfile = ({ route }) => {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Select Gender</Text>
+                        <Title style={styles.modalTitle}>Select Gender</Title>
                         {genderOptions.map((gender) => (
                             <TouchableOpacity
                                 key={gender}
@@ -416,7 +416,7 @@ const EditProfile = ({ route }) => {
                             style={styles.cancelButton}
                             onPress={() => setShowGenderModal(false)}
                         >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                            <Title style={styles.cancelButtonText}>Cancel</Title>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -440,21 +440,18 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: '600',
         color: THEME_COLORS.text,
         letterSpacing: -0.5,
     },
     saveButton: {
-        backgroundColor: THEME_COLORS.primary,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
+        backgroundColor: '#e1e1e1ff',
+        paddingHorizontal: 20,
+        paddingVertical: 5,
         borderRadius: 8,
     },
     saveButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
-        letterSpacing: -0.3,
+        color: '#000',
+        fontSize: 13,
     },
     formContainer: {
         flex: 1,
@@ -502,18 +499,10 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
     },
     formSection: {
-        backgroundColor: THEME_COLORS.background,
         borderRadius: 12,
         padding: 16,
         marginBottom: 8,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.05,
-        shadowRadius: 3,
-        elevation: 2,
     },
     inputGroup: {
         marginBottom: 20,
@@ -521,18 +510,17 @@ const styles = StyleSheet.create({
     inputLabel: {
         fontSize: 14,
         color: THEME_COLORS.textSecondary,
-        marginBottom: 8,
-        fontWeight: '500',
+        marginBottom: 0,
         letterSpacing: -0.2,
     },
     input: {
         fontSize: 16,
         color: THEME_COLORS.text,
-        padding: 12,
-        backgroundColor: THEME_COLORS.inputBg,
+        padding: 10,
         borderRadius: 8,
-        borderWidth: 1,
-        borderColor: THEME_COLORS.border,
+        borderBottomWidth: 1,
+        borderBottomColor: THEME_COLORS.border,
+        width: '100%'
     },
     bioInput: {
         height: 100,
@@ -549,11 +537,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        backgroundColor: THEME_COLORS.inputBg,
         borderRadius: 8,
         marginBottom: 12,
-        borderWidth: 1,
-        borderColor: THEME_COLORS.border,
+        borderBottomWidth: 1,
+        borderBottomColor: THEME_COLORS.border,
     },
     optionLeft: {
         flexDirection: 'row',
@@ -574,7 +561,7 @@ const styles = StyleSheet.create({
     modalContainer: {
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(0, 0, 0, 0)',
     },
     modalContent: {
         backgroundColor: THEME_COLORS.background,

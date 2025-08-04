@@ -319,7 +319,7 @@ export default function OtherUserProfileScreen({ route }) {
                     width: 130,
                     marginLeft: -60,
                     fontWeight: 300,
-                    backgroundColor: '#f9f9f9',
+                    backgroundColor: '#ffffffff',
                   }}
                 >
                   <Subtitle

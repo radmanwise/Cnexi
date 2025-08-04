@@ -24,7 +24,7 @@ import {
   RefreshControl,
   Animated
 } from 'react-native';
-
+import ShareButton from '../buttons/ShareButton';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POST_HEIGHT = SCREEN_HEIGHT * 0.50;
@@ -311,14 +311,28 @@ const PostScreen = ({ filter, scrollY }) => {
 
       <View style={styles.actionsContainer}>
         <View style={styles.leftActions} onStartShouldSetResponder={() => true}>
-          <LikeButton postId={item.id} initialLiked={item.is_liked} iconSize={28} />
+
+          <TouchableOpacity style={styles.iconWrapper}>
+            <LikeButton postId={item.id} initialLiked={item.is_liked} iconSize={27} />
+          </TouchableOpacity>
+
           <View onStartShouldSetResponder={() => true}>
-            <CommentButton postId={item.id} iconSize={28} />
+
+            <TouchableOpacity style={styles.iconWrapper}>
+              <CommentButton postId={item.id} iconSize={28} />
+            </TouchableOpacity>
+
           </View>
-          {/* <ShareButton postId={item.id} iconColor="black" iconSize={23} /> */}
+
+          {/* <TouchableOpacity style={styles.iconWrapper}>
+            <ShareButton postId={item.id} iconColor="black" iconSize={23} />
+          </TouchableOpacity> */}
         </View>
         <View style={styles.rightActions}>
-          <SaveButton postId={item.id} initialSaved={item.is_saved} iconSize={23} />
+
+          <TouchableOpacity style={styles.iconWrapper}>
+            <SaveButton postId={item.id} initialSaved={item.is_saved} iconSize={24.3} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -523,9 +537,12 @@ const styles = StyleSheet.create({
   // },
 
 
-
-
-
+  iconWrapper: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
 
 
   slideContainer: {
@@ -555,7 +572,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     backgroundColor: '#fff',
   },
@@ -564,16 +581,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '40%',
     borderRadius: 20,
-    padding: 2,
-    height: 35,
-    right: 10,
+    right: 15,
   },
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    flex: 1,
-    paddingLeft: 10,
+    width: '40%',
+    borderRadius: 20,
+    left: 110,
   },
   captionContainer: {
     paddingHorizontal: 15,

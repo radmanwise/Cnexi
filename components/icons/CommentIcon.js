@@ -6,7 +6,7 @@ const CommentIcon = ({ size = 24, color = "black" }) => {
     <Svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      strokeWidth={1.7}
+      strokeWidth={1.8}
       stroke={color}
       fill="none"
       width={size}

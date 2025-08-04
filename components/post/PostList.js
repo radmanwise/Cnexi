@@ -114,20 +114,26 @@ const PostList = ({ posts, fetchPosts }) => {
     <View style={styles.tabBar}>
       {routes.map((route, i) => {
         const focused = index === i;
-        const icon = React.cloneElement(route.icon, {
-          color: focused ? '#282829ff' : '#a3a3a3ff',
-        });
-
         return (
           <TouchableOpacity
             key={route.key}
-            style={styles.tabItem}
+            style={[
+              styles.tabItem,
+              index === i && styles.tabItemFocused
+            ]}
             onPress={() => setIndex(i)}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
           >
-            {icon}
-            {focused && <View style={styles.indicator} />}
+            <Text
+              style={[
+                styles.tabText,
+                index === i && styles.tabTextFocused
+              ]}
+            >
+              {route.title}
+            </Text>
           </TouchableOpacity>
+
         );
       })}
     </View>
@@ -210,39 +216,35 @@ const styles = StyleSheet.create({
     marginTop: 5,
     textAlign: 'center',
   },
-  IconContent: {
-    backgroundColor: '#F1F1F1',
-    borderRadius: 50,
-    padding: 20,
-  },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderBottomColor: '#dcd9d9ff',
-    borderBottomWidth: 0.2,
-    justifyContent: 'space-around',
-    paddingHorizontal: 10,
+    justifyContent: 'space-evenly',
+    paddingVertical: 15,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e0e0e0',
+    gap: 15
   },
   tabItem: {
-    flex: 1,
-    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#f2f2f2', 
+    marginHorizontal: 4,
+  },
+  tabItemFocused: {
+    backgroundColor: '#222222',
   },
   tabText: {
-    color: '#a3a3a3ff',
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#555',
   },
   tabTextFocused: {
-    color: '#202020ff',
-    fontSize: 14,
+    color: '#ffffff',
   },
-  indicator: {
-    marginTop: 13,
-    height: 1,
-    width: '110%',
-    backgroundColor: '#1c1c1cff',
-    borderRadius: 15,
-    left: -5
-  },
+
+
 });
 
 export default PostList;

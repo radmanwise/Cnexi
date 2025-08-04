@@ -112,7 +112,7 @@ export default function ProfileScreen() {
     setTimeout(() => setIsModalVisible(false), 100);
   };
 
-  const MAX_BIO_LENGTH = 50;
+  const MAX_BIO_LENGTH = 120;
 
   const truncateText = (text, length) =>
     text.length > length ? text.substring(0, length) + '...' : text;
@@ -306,7 +306,7 @@ export default function ProfileScreen() {
 
           </View>
         </View>
-        <View style={{ bottom: 140 }}>
+        <View style={{ bottom: 155 }}>
           <PostList posts={profileData?.posts || []} />
         </View>
       </ScrollView>
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   biography: {
-    fontSize: 13,
+    fontSize: 13.5,
     fontFamily: 'Manrope',
     lineHeight: 25,
     color: '#272727ff',

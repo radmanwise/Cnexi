@@ -14,7 +14,7 @@ export default function HomeNavigationBar() {
       <View style={styles.menuBar}>
         <View style={styles.leftSection}>
           <Image
-            source={require('../../assets/img/app/CnexiBlue.png')}
+            source={require('../../assets/img/app/cnexi.png')}
             style={styles.logo}
             resizeMode="contain"
           />

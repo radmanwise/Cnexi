@@ -88,9 +88,9 @@ const MemoTabBar = memo(({ index, setIndex, routes, loading }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Title style={[styles.tabText, isFocused && styles.tabTextActive]}>
+            <Subtitle style={[styles.tabText, isFocused && styles.tabTextActive]}>
               {route.title}
-            </Title>
+            </Subtitle>
           </TouchableOpacity>
         );
       })}
@@ -211,10 +211,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tabItem: {
-    paddingVertical: 8,
+    paddingVertical: 7,
     paddingHorizontal: 18,
     backgroundColor: '#f0f0f0',
-    borderRadius: 10,
+    borderRadius: 15,
   },
   tabItemActive: {
     backgroundColor: '#333',

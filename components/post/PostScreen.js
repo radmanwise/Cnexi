@@ -24,7 +24,8 @@ import {
   StyleSheet,
   Dimensions,
   RefreshControl,
-  Animated
+  Animated,
+  ActivityIndicator,
 } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -115,6 +116,7 @@ const PostScreen = ({ filter, scrollY }) => {
 
   const fetchPosts = useCallback(async (pageToFetch = 1, shouldRefresh = false) => {
     try {
+      setState(prev => ({ ...prev, loading: true }));
       const token = await SecureStore.getItemAsync('token');
       const response = await axios.get(
         `${ipconfig.BASE_URL}/post/following/post-list/?page=${pageToFetch}`,
@@ -130,7 +132,7 @@ const PostScreen = ({ filter, scrollY }) => {
         hasNextPage: response.data.next !== null,
         page: pageToFetch,
         loading: false,
-        refreshing: false
+        refreshing: false,
       }));
     } catch (error) {
       console.error('Error fetching posts:', error);
@@ -151,6 +153,7 @@ const PostScreen = ({ filter, scrollY }) => {
       fetchPosts(page + 1);
     }
   }, [state, fetchPosts]);
+
 
 
   const truncateText = useMemo(() => (str, maxLength) =>
@@ -417,7 +420,7 @@ const PostScreen = ({ filter, scrollY }) => {
           handlePostChange(index);
         }}
         onEndReached={loadMorePosts}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.1}
         refreshControl={
           <RefreshControl
             refreshing={state.refreshing}
@@ -428,6 +431,7 @@ const PostScreen = ({ filter, scrollY }) => {
             progressBackgroundColor="#ffffffff"
           />
         }
+
         scrollEventThrottle={16}
         initialNumToRender={5}
         maxToRenderPerBatch={5}
@@ -443,6 +447,13 @@ const PostScreen = ({ filter, scrollY }) => {
               { useNativeDriver: true }
             )
             : null
+        }
+        ListFooterComponent={
+          state.loading && state.page > 1 ? (
+            <View style={{ paddingVertical: 20 }}>
+              <ActivityIndicator size="small" color="#000" />
+            </View>
+          ) : null
         }
       />
       <ZoomMediaModal
@@ -582,12 +593,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 4,
     backgroundColor: '#fff',
-    gap: 2
   },
   leftActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '40%',
+    width: '20%',
     right: 15,
   },
   rightActions: {

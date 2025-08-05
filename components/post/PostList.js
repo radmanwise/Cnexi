@@ -122,14 +122,14 @@ const PostList = ({ posts, fetchPosts }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Title
+            <Subtitle
               style={[
                 styles.tabText,
                 index === i && styles.tabTextFocused
               ]}
             >
               {route.title}
-            </Title>
+            </Subtitle>
           </TouchableOpacity>
 
         );
@@ -160,10 +160,10 @@ const PostList = ({ posts, fetchPosts }) => {
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
             <ImageOffIcon size={40} color="#424242" />
-            <Text style={styles.emptyTitle}>No Posts Yet</Text>
-            <Text style={styles.emptySubTitle}>
+            <Title style={styles.emptyTitle}>No Posts Yet</Title>
+            <Subtitle style={styles.emptySubTitle}>
               Start the conversation by sharing your first post!
-            </Text>
+            </Subtitle>
           </View>
         )}
       />
@@ -204,15 +204,15 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#333',
     marginTop: 10,
   },
   emptySubTitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#777',
     marginTop: 5,
     textAlign: 'center',
+    width: '80%'
   },
   tabBar: {
     flexDirection: 'row',
@@ -224,9 +224,9 @@ const styles = StyleSheet.create({
     gap: 15
   },
   tabItem: {
-    paddingVertical: 6,
+    paddingVertical: 5,
     paddingHorizontal: 16,
-    borderRadius: 9,
+    borderRadius: 12,
     backgroundColor: '#f2f2f2', 
     marginHorizontal: 4,
   },
@@ -234,15 +234,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#222222',
   },
   tabText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '500',
     color: '#000',
   },
   tabTextFocused: {
     color: '#ffffff',
   },
-
-
 });
 
 export default PostList;

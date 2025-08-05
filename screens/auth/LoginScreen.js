@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import ipconfig from '../../config/ipconfig';
 import * as Font from 'expo-font';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Title, Subtitle } from '../../components/ui/Typography';
 import {
   View, Text, TouchableOpacity,
   StyleSheet,

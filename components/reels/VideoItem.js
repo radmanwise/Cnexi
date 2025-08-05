@@ -22,6 +22,7 @@ const VideoItem = ({
   showDoubleTapHeart,
   heartAnim,
   navigation,
+  scrollToIndex,
 }) => {
   const [progress, setProgress] = useState(0);
 
@@ -30,7 +31,15 @@ const VideoItem = ({
       const ratio = status.positionMillis / status.durationMillis;
       setProgress(ratio);
     }
-  }, []);
+
+    if (status.didJustFinish) {
+      const nextIndex = index + 1;
+      if (videoRefs.current[nextIndex]) {
+        scrollToIndex(nextIndex);
+      }
+    }
+  }, [index, videoRefs, scrollToIndex]);
+
 
   useEffect(() => {
     const video = videoRefs.current[index];
@@ -48,7 +57,7 @@ const VideoItem = ({
     <View style={styles.videoContainer}>
       <TouchableWithoutFeedback onPress={() => handleVideoPress(index)}>
         <View style={styles.videoWrapper}>
-          
+
           <Video
             ref={ref => videoRefs.current[index] = ref}
             source={{ uri: item.files[0].file }}
@@ -63,7 +72,7 @@ const VideoItem = ({
             usePoster={true}
             posterStyle={styles.posterImage}
           />
-          
+
 
           <View style={localStyles.progressBarContainer}>
             <Animated.View style={[localStyles.progressBar, { width: `${progress * 100}%` }]} />
@@ -112,14 +121,14 @@ const VideoItem = ({
                   textStyle={{ fontSize: 12 }}
                   borderColor="#ffffffff"
                   followColor="null"
-                  unfollowTextColor="none"
-                  followTextColor="#121212ff"
+                  unfollowTextColor="#fcfcfcff"
+                  followTextColor="#fcfcfcff"
                 />
               )}
             </View>
           </TouchableOpacity>
         </View>
-        <View style={{ top: 20,  }}>
+        <View style={{ top: 20, }}>
           <Caption description={item.description || ""} />
         </View>
       </View>

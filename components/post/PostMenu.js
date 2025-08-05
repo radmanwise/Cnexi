@@ -11,7 +11,6 @@ import {
   Dimensions,
   StyleSheet
 } from 'react-native';
-
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { UserRoundXIcon, EllipsisVerticalIcon } from 'lucide-react-native';

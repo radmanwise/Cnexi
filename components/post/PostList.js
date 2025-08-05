@@ -1,12 +1,10 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
-  FlatList,
   Text,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Video } from 'expo-av';
@@ -124,14 +122,14 @@ const PostList = ({ posts, fetchPosts }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Text
+            <Title
               style={[
                 styles.tabText,
                 index === i && styles.tabTextFocused
               ]}
             >
               {route.title}
-            </Text>
+            </Title>
           </TouchableOpacity>
 
         );
@@ -228,7 +226,7 @@ const styles = StyleSheet.create({
   tabItem: {
     paddingVertical: 6,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 9,
     backgroundColor: '#f2f2f2', 
     marginHorizontal: 4,
   },
@@ -238,7 +236,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#555',
+    color: '#000',
   },
   tabTextFocused: {
     color: '#ffffff',

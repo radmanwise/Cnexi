@@ -1,4 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import { Ionicons } from '@expo/vector-icons';
+import FastImage from 'expo-fast-image';
+import { Video } from 'expo-av';
+import Slider from '@react-native-community/slider';
+import * as NavigationBar from 'expo-navigation-bar';
 import {
   Modal,
   StyleSheet,
@@ -18,13 +24,6 @@ import Animated, {
   runOnJS,
   Easing,
 } from 'react-native-reanimated';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
-import FastImage from 'expo-fast-image';
-import { Video } from 'expo-av';
-import Slider from '@react-native-community/slider';
-import * as NavigationBar from 'expo-navigation-bar';
-
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -185,7 +184,7 @@ const ZoomMediaModal = ({ visible, onClose, media }) => {
                     minimumValue={0}
                     maximumValue={duration}
                     value={position}
-                    minimumTrackTintColor="#ffffffff"  // سبز روشن
+                    minimumTrackTintColor="#ffffffff" 
                     maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
                     thumbTintColor="#ffffffff"
                     onSlidingStart={onSeekStart}

@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-const ThumbsUpIcon = ({ size = 24, color = 'currentColor', strokeWidth = 1.8 }) => (
+const ThumbsUpIcon = ({ size = 24, color = 'currentColor', strokeWidth = 1.6 }) => (
   <Svg
     width={size}
     height={size}

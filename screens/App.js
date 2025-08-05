@@ -36,7 +36,6 @@ import {
   AccountStatus,
   FollowingScreen,
   FollowersScreen,
-  FollowSuggestions,
   ReportBug,
   DataUsage,
   Security,

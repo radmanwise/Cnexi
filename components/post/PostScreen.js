@@ -13,6 +13,8 @@ import ipconfig from '../../config/ipconfig';
 import BadgeCheck from '../icons/BadgeCheck';
 import ZoomMediaModal from './ZoomMediaModal';
 import Maximize2Icon from '../icons/Maximize2Icon';
+import ShareButton from '../buttons/ShareButton';
+import { Title, Subtitle } from '../ui/Typography';
 import {
   View,
   Text,
@@ -24,7 +26,6 @@ import {
   RefreshControl,
   Animated
 } from 'react-native';
-import ShareButton from '../buttons/ShareButton';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POST_HEIGHT = SCREEN_HEIGHT * 0.50;
@@ -172,7 +173,7 @@ const PostScreen = ({ filter, scrollY }) => {
             style={styles.profileImage}
             cacheKey={`profile-${item.username}`}
           />
-          <Text style={styles.username}>{truncateText(item.username || 'username', 12)}</Text>
+          <Title style={styles.username}>{truncateText(item.username || 'username', 12)}</Title>
           {item.username === 'voss' && <BadgeCheck />}
         </TouchableOpacity>
         <PostMenu style={{ left: 8 }} />
@@ -340,6 +341,14 @@ const PostScreen = ({ filter, scrollY }) => {
         <CaptionWithMore description={item.description} />
       </View>
 
+      {item.hashtags && item.hashtags.length > 0 && (
+        <View style={styles.hashtagsContainer}>
+          {item.hashtags.map((tag, index) => (
+            <Subtitle key={index} style={styles.hashtagText}>#{tag.name}</Subtitle>
+          ))}
+        </View>
+      )}
+
       <Text style={styles.date}>
         {item.files[0].created_at_humanized}
       </Text>
@@ -477,8 +486,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginLeft: 0,
     color: 'black',
-    fontFamily: 'ManropeSemiBold',
-    fontWeight: '600',
     top: -2,
   },
   mediaContainer: {
@@ -491,32 +498,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     left: 8,
   },
-  mediaContent: {
-    width: '120%',
-    height: '100%',
-    aspectRatio: 4 / 4,
-    borderRadius: 12,
-    backgroundColor: '#e2e2e2e8',
-    alignSelf: 'center',
-  },
-  videoZoomButton: {
-    position: 'absolute',
-    bottom: 15,
-    right: 345,
-    backgroundColor: '#00000088',
-    borderRadius: 50,
-    padding: 7,
-  },
-
-
-
   // mediaContent: {
-  //   width: '100%',
+  //   width: '120%',
   //   height: '100%',
-  //   backgroundColor: '#ffff',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   borderRadius: 12
+  //   aspectRatio: 4 / 4,
+  //   borderRadius: 12,
+  //   backgroundColor: '#e2e2e2e8',
+  //   alignSelf: 'center',
   // },
   // videoZoomButton: {
   //   position: 'absolute',
@@ -526,15 +514,34 @@ const styles = StyleSheet.create({
   //   borderRadius: 50,
   //   padding: 7,
   // },
-  // slideContainer: {
-  //   width: SCREEN_WIDTH,
-  //   height: POST_HEIGHT,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   backgroundColor: '#ffff',
-  //   borderWidth: 0.3,
-  //   borderColor: 'gray'
-  // },
+
+
+
+  mediaContent: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#ffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12
+  },
+  videoZoomButton: {
+    position: 'absolute',
+    bottom: 15,
+    right: 345,
+    backgroundColor: '#00000088',
+    borderRadius: 50,
+    padding: 7,
+  },
+  slideContainer: {
+    width: SCREEN_WIDTH,
+    height: POST_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffff',
+    borderWidth: 0.3,
+    borderColor: 'gray'
+  },
 
 
   iconWrapper: {
@@ -546,11 +553,11 @@ const styles = StyleSheet.create({
 
 
   slideContainer: {
-    width: SCREEN_WIDTH * 0.95, // بهتره کمی کمتر از عرض کل باشه
+    width: SCREEN_WIDTH * 0.95,
     height: POST_HEIGHT,
-    overflow: 'hidden', // 👈 جلوگیری از بیرون زدن تصویر
+    overflow: 'hidden',
     borderRadius: 12,
-    backgroundColor: '#000', // کمک به تمیزی لبه‌ها
+    backgroundColor: '#000',
     alignSelf: 'center',
   },
   paginationDots: {
@@ -572,22 +579,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
     backgroundColor: '#fff',
+    gap: 2
   },
   leftActions: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '40%',
-    borderRadius: 20,
     right: 15,
   },
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '40%',
-    borderRadius: 20,
     left: 110,
   },
   captionContainer: {
@@ -605,6 +611,24 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
     fontFamily: 'Manrope',
   },
+  hashtagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 6,
+    paddingHorizontal: 12,
+  },
+
+  hashtagText: {
+    color: '#000',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 6,
+    marginBottom: 6,
+    borderRadius: 20,
+    fontSize: 13,
+  },
+
 });
 
 export default PostScreen;

@@ -24,7 +24,6 @@ const SearchUserScreen = () => {
                 id: '1',
                 name: 'Emma Watson',
                 username: '@emma',
-                avatar: require('../assets/img/app/cnexi.jpg'),
                 verified: true,
                 followers: '28.9M'
             },
@@ -32,7 +31,6 @@ const SearchUserScreen = () => {
                 id: '2',
                 name: 'Tom Holland',
                 username: '@tomh',
-                avatar: require('../assets/img/app/cnexi.jpg'),
                 verified: true,
                 followers: '19.2M'
             },
@@ -40,7 +38,6 @@ const SearchUserScreen = () => {
                 id: '3',
                 name: 'Zendaya',
                 username: '@zend',
-                avatar: require('../assets/img/app/cnexi.jpg'),
                 verified: true,
                 followers: '24.5M'
             },

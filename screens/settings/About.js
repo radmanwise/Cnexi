@@ -69,7 +69,7 @@ const AboutScreen = () => {
           style={styles.logoContainer}
         >
           <Image
-            source={require('../../assets/img/app/cnexi.jpg')}
+            source={require('../../assets/img/app/cnexi.png')}
             style={styles.logo}
           />
           <Text style={styles.appName}>{t('Nex')}</Text>

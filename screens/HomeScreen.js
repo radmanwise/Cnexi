@@ -16,7 +16,6 @@ import HomeNavigationBar from '../navigation/home/HomeNavigationBar';
 import PostScreen from '../components/post/PostScreen';
 import { Subtitle, Title } from '../components/ui/Typography';
 
-// SkeletonBox animation
 const SkeletonBox = ({ width, height, borderRadius = 8, style }) => {
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
 
@@ -117,7 +116,6 @@ export default function HomeScreen() {
   const [routes] = useState(tabRoutes);
   const [loading, setLoading] = useState(true);
 
-  // simulate loading for 1 second
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
@@ -216,14 +214,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 18,
     backgroundColor: '#f0f0f0',
-    borderRadius: 24,
+    borderRadius: 10,
   },
   tabItemActive: {
     backgroundColor: '#333',
   },
   tabText: {
-    fontSize: 13,
-    color: '#555',
+    fontSize: 12,
+    color: '#000',
   },
   tabTextActive: {
     color: '#fff',

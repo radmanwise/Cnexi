@@ -1,16 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  StyleSheet,
-  Dimensions,
-  Image,
-  FlatList,
-  ActivityIndicator,
-  Animated,
-} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Video } from 'expo-av';
 import axios from 'axios';
@@ -23,6 +11,18 @@ import PostMenu from '../components/post/PostMenu';
 import CaptionWithMore from '../components/post/caption/CaptionWithMore';
 import ipconfig from '../config/ipconfig';
 import { Subtitle, Title } from '../components/ui/Typography';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  StyleSheet,
+  Dimensions,
+  Image,
+  FlatList,
+  ActivityIndicator,
+  Animated,
+} from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 const POST_HEIGHT = height * 0.45;
@@ -139,7 +139,7 @@ const PostDetailScreen = ({ route }) => {
   if (loading) {
     return (
       <ScrollView style={styles.skeletonContainer}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 50, marginLeft: 0 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 50, marginLeft: 10 }}>
           <SkeletonBox width={40} height={40} borderRadius={20} />
           <SkeletonBox width={100} height={12} borderRadius={6} style={{ marginLeft: 10 }} />
         </View>

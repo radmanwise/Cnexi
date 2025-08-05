@@ -28,10 +28,14 @@ const ReelsScreen = () => {
     error,
     refreshing,
     onRefresh,
+    fetchMore,    
+    hasMore,    
   } = useReelsData();
 
-  const videoRefs = useRef({}); 
-  const flatListRef = useRef(null);  
+
+
+  const videoRefs = useRef({});
+  const flatListRef = useRef(null);
 
   const [currentPlayingIndex, setCurrentPlayingIndex] = useState(null);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
@@ -40,6 +44,13 @@ const ReelsScreen = () => {
   const likeAnimation = useRef(new Animated.Value(1)).current;
   const [showPlayIcon, setShowPlayIcon] = useState(false);
   const playIconAnim = useRef(new Animated.Value(0)).current;
+
+
+  const scrollToIndex = (index) => {
+    flatListRef.current?.scrollToIndex({ index, animated: true });
+    setCurrentPlayingIndex(index);
+  };
+
 
   // Load fonts
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -204,13 +215,13 @@ const ReelsScreen = () => {
 
       <FlatList
         data={videos}
-        ref={flatListRef} 
+        ref={flatListRef}
         renderItem={({ item, index }) => (
           <VideoItem
             item={item}
             index={index}
             currentPlayingIndex={currentPlayingIndex}
-            videoRefs={videoRefs} 
+            videoRefs={videoRefs}
             handleVideoPress={handleVideoPress}
             likes={likes}
             onLike={handleLike}
@@ -220,6 +231,7 @@ const ReelsScreen = () => {
             heartAnim={heartAnim}
             navigation={navigation}
             onDoubleTap={() => handleDoubleTap(item.id)}
+            scrollToIndex={scrollToIndex}
           />
         )}
         keyExtractor={item => item.id.toString()}
@@ -234,6 +246,12 @@ const ReelsScreen = () => {
         maxToRenderPerBatch={3}
         windowSize={5}
         initialNumToRender={2}
+        onEndReached={() => {
+          if (hasMore) {
+            fetchMore();
+          }
+        }}
+        onEndReachedThreshold={0.5}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -245,6 +263,7 @@ const ReelsScreen = () => {
           />
         }
       />
+
     </View>
   );
 };

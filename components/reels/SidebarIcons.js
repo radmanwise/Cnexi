@@ -33,27 +33,4 @@ const SidebarIcons = ({ item, likes, onLike }) => {
   );
 };
 
-// const styles = StyleSheet.create({
-//   sideBar: {
-//     position: 'absolute',
-//     right: 15,
-//     bottom: 100,
-//     alignItems: 'center',
-//     gap: 10,
-//   },
-//   iconButton: {
-//     alignItems: 'center',
-//     marginBottom: 15,
-//   },
-//   iconText: {
-//     color: 'white',
-//     fontSize: 12,
-//     fontWeight: '400',
-//     marginTop: 4,
-//     textShadowColor: 'rgba(0,0,0,0.5)',
-//     textShadowOffset: { width: 1, height: 1 },
-//     textShadowRadius: 3,
-//   },
-// });
-
 export default SidebarIcons;

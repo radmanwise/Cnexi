@@ -119,108 +119,108 @@ const SettingsScreen = () => {
   };
 
   const settingsData = [
-    {
-      title: t('Appearance'),
-      items: [
-        {
-          icon: Feather,
-          iconName: 'sun',
-          title: t('Theme'),
-          subtitle: t('Dark mode, Light mode, System'),
-          onPress: () => navigation.navigate('ChangeThem'),
-        },
-      ],
-    },
-    {
-      title: t('Privacy & Security'),
-      items: [
-        {
-          icon: MaterialIcons,
-          iconName: 'block-flipped',
-          title: t('Block'),
-          subtitle: t('Manage blocked accounts'),
-          onPress: () => navigation.navigate('Block'),
-          badgeCount: 2,
-        },
-        {
-          icon: MaterialCommunityIcons,
-          iconName: 'account-circle-outline',
-          title: t('Account'),
-          subtitle: t('Security and privacy settings'),
-          onPress: () => navigation.navigate('Account'),
-        },
-        {
-          icon: MaterialIcons,
-          iconName: 'security',
-          title: t('Security'),
-          subtitle: t('2FA and security settings'),
-          onPress: () => navigation.navigate('Security'),
-        },
-      ],
-    },
-    {
-      title: t('Preferences'),
-      items: [
-        {
-          icon: Ionicons,
-          iconName: 'language-sharp',
-          title: t('Language'),
-          subtitle: t('Change app language'),
-          onPress: () => navigation.navigate('LanguageSwitcher'),
-        },
-        {
-          icon: Feather,
-          iconName: 'star',
-          title: t('Favorites'),
-          subtitle: t('Manage your favorites'),
-          onPress: () => navigation.navigate('Favorites'),
-        },
-        {
-          icon: Feather,
-          iconName: 'bell',
-          title: t('Notifications'),
-          subtitle: t('Manage notifications'),
-          onPress: () => navigation.navigate('Notifications'),
-          badgeCount: 5,
-        },
-      ],
-    },
-    {
-      title: t('Account & Data'),
-      items: [
-        {
-          icon: Feather,
-          iconName: 'pie-chart',
-          title: t('Account status'),
-          subtitle: t('View account statistics'),
-          onPress: () => navigation.navigate('AccountStatus'),
-        },
-        {
-          icon: MaterialIcons,
-          iconName: 'data-usage',
-          title: t('Data usage'),
-          subtitle: t('Manage data settings'),
-          onPress: () => navigation.navigate('DataUsage'),
-        },
-      ],
-    },
+    // {
+    //   title: t('Appearance'),
+    //   items: [
+    //     {
+    //       icon: Feather,
+    //       iconName: 'sun',
+    //       title: t('Theme'),
+    //       subtitle: t('Dark mode, Light mode, System'),
+    //       onPress: () => navigation.navigate('ChangeThem'),
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: t('Privacy & Security'),
+    //   items: [
+    //     {
+    //       icon: MaterialIcons,
+    //       iconName: 'block-flipped',
+    //       title: t('Block'),
+    //       subtitle: t('Manage blocked accounts'),
+    //       onPress: () => navigation.navigate('Block'),
+    //       badgeCount: 2,
+    //     },
+    //     {
+    //       icon: MaterialCommunityIcons,
+    //       iconName: 'account-circle-outline',
+    //       title: t('Account'),
+    //       subtitle: t('Security and privacy settings'),
+    //       onPress: () => navigation.navigate('Account'),
+    //     },
+    //     {
+    //       icon: MaterialIcons,
+    //       iconName: 'security',
+    //       title: t('Security'),
+    //       subtitle: t('2FA and security settings'),
+    //       onPress: () => navigation.navigate('Security'),
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: t('Preferences'),
+    //   items: [
+    //     {
+    //       icon: Ionicons,
+    //       iconName: 'language-sharp',
+    //       title: t('Language'),
+    //       subtitle: t('Change app language'),
+    //       onPress: () => navigation.navigate('LanguageSwitcher'),
+    //     },
+    //     {
+    //       icon: Feather,
+    //       iconName: 'star',
+    //       title: t('Favorites'),
+    //       subtitle: t('Manage your favorites'),
+    //       onPress: () => navigation.navigate('Favorites'),
+    //     },
+    //     {
+    //       icon: Feather,
+    //       iconName: 'bell',
+    //       title: t('Notifications'),
+    //       subtitle: t('Manage notifications'),
+    //       onPress: () => navigation.navigate('Notifications'),
+    //       badgeCount: 5,
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: t('Account & Data'),
+    //   items: [
+    //     {
+    //       icon: Feather,
+    //       iconName: 'pie-chart',
+    //       title: t('Account status'),
+    //       subtitle: t('View account statistics'),
+    //       onPress: () => navigation.navigate('AccountStatus'),
+    //     },
+    //     {
+    //       icon: MaterialIcons,
+    //       iconName: 'data-usage',
+    //       title: t('Data usage'),
+    //       subtitle: t('Manage data settings'),
+    //       onPress: () => navigation.navigate('DataUsage'),
+    //     },
+    //   ],
+    // },
     {
       title: t('Support & About'),
       items: [
-        {
-          icon: AntDesign,
-          iconName: 'exclamationcircleo',
-          title: t('About'),
-          subtitle: t('App information and credits'),
-          onPress: () => navigation.navigate('About'),
-        },
-        {
-          icon: MaterialIcons,
-          iconName: 'bug-report',
-          title: t('Report bug'),
-          subtitle: t('Help us improve'),
-          onPress: () => navigation.navigate('ReportBug'),
-        },
+        // {
+        //   icon: AntDesign,
+        //   iconName: 'exclamationcircleo',
+        //   title: t('About'),
+        //   subtitle: t('App information and credits'),
+        //   onPress: () => navigation.navigate('About'),
+        // },
+        // {
+        //   icon: MaterialIcons,
+        //   iconName: 'bug-report',
+        //   title: t('Report bug'),
+        //   subtitle: t('Help us improve'),
+        //   onPress: () => navigation.navigate('ReportBug'),
+        // },
         {
           icon: Feather,
           iconName: 'log-out',

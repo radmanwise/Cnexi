@@ -19,7 +19,6 @@ import EditProfile from "./EditProfile";
 import OtherUserProfileScreen from "./OtherUserProfileScreen";
 import FollowingScreen from "./FollowingScreen";
 import FollowersScreen from "./FollowersScreen";
-import FollowSuggestions from "./FollowSuggestions";
 
 // Settings Screens
 import SettingsScreen from "./settings/SettingsScreen";
@@ -61,7 +60,6 @@ export {
     OtherUserProfileScreen,
     FollowingScreen,
     FollowersScreen,
-    FollowSuggestions,
     
     // Settings
     SettingsScreen,

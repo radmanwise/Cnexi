@@ -1,4 +1,9 @@
 import React, { useRef, useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import { Title, Subtitle } from '../../components/ui/Typography';
+import PostTypeCard from './PostTypeCard';
+import MediaPreview from './MediaPreview';
+import LoadingScreen from './LoadingScreen';
 import {
   View,
   StyleSheet,
@@ -6,11 +11,6 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { Title, Subtitle } from '../../components/ui/Typography';
-import PostTypeCard from './PostTypeCard';
-import MediaPreview from './MediaPreview';
-import LoadingScreen from './LoadingScreen';
 
 function MediaSourceSelector({ onSelect }) {
   return (

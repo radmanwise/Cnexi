@@ -6,6 +6,13 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
+import ipconfig from '../config/ipconfig';
+import * as Font from 'expo-font';
+import { Animated } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { Easing } from 'react-native-reanimated';
+import { Subtitle, Title } from '../components/ui/Typography';
 import {
   View,
   Text,
@@ -19,13 +26,6 @@ import {
   Modal,
   Dimensions
 } from 'react-native';
-import ipconfig from '../config/ipconfig';
-import * as Font from 'expo-font';
-import { Animated } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Easing } from 'react-native-reanimated';
-import { Subtitle, Title } from '../components/ui/Typography';
 
 
 export default function OtherUserProfileScreen({ route }) {

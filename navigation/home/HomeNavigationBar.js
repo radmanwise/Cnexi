@@ -25,13 +25,13 @@ export default function HomeNavigationBar() {
             style={styles.iconButton}
             onPress={() => navigation.navigate('AddPostScreen')}
           >
-            <AddIcon size={24} color="#4e4e4eff" />
+            <AddIcon size={24} color="#000000ff" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => navigation.navigate('NotificationsScreen')}
           >
-            <AlarmIcon size={24} color="#4e4e4eff" fill="#ffffffff" />
+            <AlarmIcon size={24} color="#000000ff" fill="#ffffffff" />
           </TouchableOpacity>
         </View>
       </View>

@@ -332,6 +332,7 @@ const EditProfile = ({ route }) => {
                 visible={showDateModal}
                 transparent={true}
                 animationType="slide"
+                
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>

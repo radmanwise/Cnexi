@@ -380,15 +380,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    fontWeight: '600',
     color: '#3A3B3C',
-    fontFamily: 'Manrope'
   },
   count: {
     fontSize: 14,
-    fontWeight: '600',
     padding: 5,
-    fontFamily: 'ManropeSemiBold',
     color: 'black',
   },
   bioContainer: {
@@ -396,17 +392,15 @@ const styles = StyleSheet.create({
     maxWidth: 360,
     padding: 20,
     width: '120%',
-    left:-19,
+    left: -8,
     justifyContent: 'center',
     alignItems: 'center'
   },
   biography: {
     fontSize: 13.5,
-    fontFamily: 'Manrope',
     lineHeight: 25,
     color: '#272727ff',
   },
-
   seeMoreText: {
     color: '#666',
     fontSize: 12,

@@ -599,8 +599,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Manrope',
   },
   date: {
-    fontSize: 11,
-    color: '#929292ff',
+    fontSize: 12,
+    color: '#8f8f8fff',
     paddingHorizontal: 15,
     paddingBottom: 7,
     fontFamily: 'Manrope',

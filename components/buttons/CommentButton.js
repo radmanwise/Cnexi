@@ -14,7 +14,7 @@ import TelegramIcon from '../../components/icons/TelegramIcon';
 import LikeIcon from '../../components/icons/LikeIcon';
 import DisLikeIcon from '../../components/icons/DisLikeIcon';
 
-const CommentsButton = ({ postId, iconSize = 24, iconColor = '#000' }) => {
+const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isReplyModalVisible, setReplyModalVisible] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -270,6 +270,7 @@ const CommentsButton = ({ postId, iconSize = 24, iconColor = '#000' }) => {
         propagateSwipe={true}
         animationIn="slideInUp"
         animationOut="slideOutDown"
+        backdropOpacity={0} 
       >
         <View style={styles.modalContentWrapper}>
           <View style={styles.modalContent}>
@@ -343,7 +344,7 @@ const CommentsButton = ({ postId, iconSize = 24, iconColor = '#000' }) => {
         onBackdropPress={() => setReplyModalVisible(false)}
         onBackButtonPress={() => setReplyModalVisible(false)}
         style={styles.replyModal}
-        backdropOpacity={0.5}
+        backdropOpacity={0}
       >
         <View style={styles.replyModalContent}>
           <View style={styles.modalHandle} />

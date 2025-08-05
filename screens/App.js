@@ -12,6 +12,7 @@ import SearchSolidIcon from '../components/icons/SearchSolidIcon';
 import UserSolidIcon from '../components/icons/UserSolidIcon';
 import { Subtitle, Title } from '../components/ui/Typography';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import LiveIcon from '../components/icons/LiveIcon';
 import {
   HomeScreen,
   ExploreScreen,
@@ -189,10 +190,10 @@ const ReelsStack = () => {
           headerRight: () => (
             <View style={styles.reelsTopButton}>
               <TouchableOpacity style={styles.buttonSide} onPress={() => navigation.navigate('ExploreScreen')}>
-                <Subtitle style={{ fontSize: 10 }}>Explore</Subtitle>
+                <LiveIcon color='#fff'/>
               </TouchableOpacity>
               <TouchableOpacity style={styles.buttonSide} onPress={() => navigation.navigate('Live')}>
-                <Subtitle style={{ fontSize: 10 }}>Lives</Subtitle>
+                <SearchIcon color='#fff'/>
               </TouchableOpacity>
             </View>
           ),
@@ -500,8 +501,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000ff',
     borderRadius: 10,
     padding: 8,
-    borderWidth: 1,
-    borderColor: '#fdfdfdff'
   },
   reelsTopButton: {
     flexDirection: 'row',

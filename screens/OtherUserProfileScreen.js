@@ -465,9 +465,9 @@ const styles = StyleSheet.create({
     maxWidth: 350,
   },
   biography: {
-    fontSize: 13,
+    fontSize: 13.5,
     color: 'black',
-    lineHeight: 18,
+    lineHeight: 25,
   },
   seeMoreButton: {
     marginTop: 5,

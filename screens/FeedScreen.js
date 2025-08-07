@@ -4,62 +4,44 @@ import { View, FlatList, StyleSheet, Dimensions, TouchableOpacity, Image } from 
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
+import PostList from '../components/post/PostList';
+const fetchPosts = async (page = 1, pageSize = 6) => {
+  try {
+    const token = await SecureStore.getItemAsync('token');
+    const response = await axios.get(
+      `${ipconfig.BASE_URL}/posts/?page=${page}&page_size=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data.results; // یا response.data بسته به سرورت
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
+};
 
 const { width } = Dimensions.get('window');
 const ITEM_SIZE = width / 3 - 2;
 
 const FeedScreen = () => {
-  const navigation = useNavigation();
-  const [posts, setPosts] = useState([]);
+  const [initialPosts, setInitialPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const token = await SecureStore.getItemAsync('token');
-        const response = await axios.get(`${ipconfig.BASE_URL}/posts/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPosts(response.data);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      } finally {
-        setLoading(false);
-      }
+    const loadInitialPosts = async () => {
+      const posts = await fetchPosts(1); // فقط ۶ تا
+      setInitialPosts(posts);
+      setLoading(false);
     };
-
-    fetchPosts();
+    loadInitialPosts();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.itemContainer}
-      onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
-      activeOpacity={0.8}
-    >
-      <Image 
-        source={{ uri: item.files[0]?.file }} 
-        style={styles.itemImage}
-        resizeMode="cover"
-      />
-      {item.files.length > 1 && (
-        <View style={styles.multipleIcon}>
-          <Ionicons name="copy" size={16} color="white" />
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        numColumns={3}
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.listContainer}
-      />
+    <View style={{ flex: 1 }}>
+      {!loading && (
+        <PostList posts={initialPosts} fetchPosts={fetchPosts} />
+      )}
     </View>
   );
 };

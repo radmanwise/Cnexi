@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 
-SplashScreen.preventAutoHideAsync();
 
-const SplashScreenSimple = ({ navigation }) => {
+const SplashScreenComponent = ({ navigation }) => {
   useEffect(() => {
     const checkLogin = async () => {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      try {
+        const token = await SecureStore.getItemAsync('token');
 
-      await SplashScreen.hideAsync(); 
-
-      const token = await SecureStore.getItemAsync('token');
-      if (token) {
-        navigation.replace('MainApp');
-      } else {
+        setTimeout(() => {
+          if (token) {
+            navigation.replace('MainApp');
+          } else {
+            navigation.replace('LoginScreen');
+          }
+        }, 1500);
+      } catch (error) {
+        console.log('Error checking token:', error);
         navigation.replace('LoginScreen');
       }
     };
@@ -34,12 +36,12 @@ const SplashScreenSimple = ({ navigation }) => {
   );
 };
 
-export default SplashScreenSimple;
+export default SplashScreenComponent;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff', 
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },

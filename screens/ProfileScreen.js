@@ -10,7 +10,7 @@ import ipconfig from '../config/ipconfig';
 import { Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Easing } from 'react-native-reanimated';
-import { Title, Subtitle } from '../components/ui/Typography'
+import { Title, Subtitle, Body } from '../components/ui/Typography'
 import {
   View,
   Text,
@@ -245,7 +245,7 @@ export default function ProfileScreen() {
 
             </TouchableOpacity>
 
-            <Title style={styles.username}>{truncateText(profileData?.username_i || '', 12)}</Title>
+            <Body style={styles.username}>{truncateText(profileData?.username_i || '', 12)}</Body>
             <View style={styles.buttonStyle}>
               {/* {isCurrentUser ? (
                 <TouchableOpacity
@@ -261,7 +261,7 @@ export default function ProfileScreen() {
                 onPress={() => navigation.navigate('EditProfile', { username: profileData?.username_i })}
                 style={styles.editButton}
               >
-                <Subtitle style={styles.editButtonText}>{t('Edit Profile')}</Subtitle>
+                <Body style={styles.editButtonText}>{t('Edit Profile')}</Body>
               </TouchableOpacity>
             </View>
           </View>
@@ -284,7 +284,7 @@ export default function ProfileScreen() {
                 style={styles.profileInformation}
                 onPress={() => item.navigateTo && navigation.navigate(item.navigateTo, { userId })}
               >
-                <Title style={styles.count}>{item.value || 0}</Title>
+                <Body style={styles.count}>{item.value || 0}</Body>
                 <Subtitle style={styles.label}>{item.label}</Subtitle>
               </TouchableOpacity>
             ))}
@@ -341,9 +341,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     marginLeft: '25%',
     fontSize: 15,
-    fontWeight: '500',
     marginTop: '9%',
-    fontFamily: 'ManropeSemiBold',
     color: 'black'
   },
   buttonStyle: {
@@ -361,11 +359,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#e9e9e9ff',
   },
   editButtonText: {
-    fontWeight: '600',
     fontSize: 12,
     textAlign: 'center',
     color: '#000',
-    fontFamily: 'ManropeSemiBold',
   },
   profileStatus: {
     flexDirection: 'row',

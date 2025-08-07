@@ -15,7 +15,7 @@ export const Subtitle = ({ children, style, ...props }) => (
 );
 
 export const Body = ({ children, style, ...props }) => (
-  <Text style={[{ fontFamily: 'ManropeRegular', fontSize: 14, color: 'white' }, style]} {...props}>
+  <Text style={[{ fontFamily: 'ManropeSemiRegular', fontSize: 14, color: 'white' }, style]} {...props}>
     {children}
   </Text>
 );

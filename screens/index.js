@@ -12,7 +12,7 @@ import RegisterScreen from "./auth/RegisterScreen";
 import PasswordScreen from "./auth/PasswordScreen";
 import SubmitScreen from "./auth/SubmitScreen";
 import OtpRegisterScreen from "./auth/OtpRegisterScreen";
-import SplashScreen from './SplashScreen';
+import SplashScreenComponent from './SplashScreenComponent';
 
 // User & Profile Screens
 import EditProfile from "./EditProfile";
@@ -54,7 +54,7 @@ export {
     PasswordScreen,
     SubmitScreen,
     OtpRegisterScreen,
-    SplashScreen,
+    SplashScreenComponent,
     // User & Profile
     EditProfile,
     OtherUserProfileScreen,

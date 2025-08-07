@@ -14,7 +14,7 @@ import BadgeCheck from '../icons/BadgeCheck';
 import ZoomMediaModal from './ZoomMediaModal';
 import Maximize2Icon from '../icons/Maximize2Icon';
 import ShareButton from '../buttons/ShareButton';
-import { Title, Subtitle } from '../ui/Typography';
+import { Title, Subtitle, Body } from '../ui/Typography';
 import {
   View,
   Text,
@@ -176,7 +176,7 @@ const PostScreen = ({ filter, scrollY }) => {
             style={styles.profileImage}
             cacheKey={`profile-${item.username}`}
           />
-          <Title style={styles.username}>{truncateText(item.username || 'username', 12)}</Title>
+          <Body style={styles.username}>{truncateText(item.username || 'username', 12)}</Body>
           {item.username === 'voss' && <BadgeCheck />}
         </TouchableOpacity>
         <PostMenu style={{ left: 8 }} />
@@ -315,19 +315,14 @@ const PostScreen = ({ filter, scrollY }) => {
 
       <View style={styles.actionsContainer}>
         <View style={styles.leftActions} onStartShouldSetResponder={() => true}>
-
           <TouchableOpacity style={styles.iconWrapper}>
             <LikeButton postId={item.id} initialLiked={item.is_liked} iconSize={27} />
           </TouchableOpacity>
-
           <View onStartShouldSetResponder={() => true}>
-
-            <TouchableOpacity style={styles.iconWrapper}>
+            <TouchableOpacity style={[styles.iconWrapper, { marginLeft: -3 }]} >
               <CommentButton postId={item.id} iconSize={28} />
             </TouchableOpacity>
-
           </View>
-
           {/* <TouchableOpacity style={styles.iconWrapper}>
             <ShareButton postId={item.id} iconColor="black" iconSize={23} />
           </TouchableOpacity> */}
@@ -352,9 +347,9 @@ const PostScreen = ({ filter, scrollY }) => {
         </View>
       )}
 
-      <Text style={styles.date}>
+      <Body style={styles.date}>
         {item.files[0].created_at_humanized}
-      </Text>
+      </Body>
       <View style={{ marginTop: 14 }}>
 
       </View>
@@ -494,7 +489,7 @@ const styles = StyleSheet.create({
     borderRadius: PROFILE_IMAGE_SIZE / 2,
   },
   username: {
-    fontSize: 13,
+    fontSize: 14,
     marginLeft: 0,
     color: 'black',
     top: -2,
@@ -597,7 +592,7 @@ const styles = StyleSheet.create({
   leftActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '20%',
+    width: '5%',
     right: 15,
   },
   rightActions: {
@@ -615,11 +610,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Manrope',
   },
   date: {
-    fontSize: 12,
-    color: '#8f8f8fff',
+    fontSize: 13,
+    color: '#aeaeaeff',
     paddingHorizontal: 15,
-    paddingBottom: 7,
-    fontFamily: 'Manrope',
+    paddingBottom: 2,
   },
   hashtagsContainer: {
     flexDirection: 'row',

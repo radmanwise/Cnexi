@@ -90,19 +90,18 @@ const FollowButton = ({
           buttonStyle,
         ])}
       >
-        <Title
+        <Body
           style={StyleSheet.flatten([
             {
               fontSize,
               letterSpacing: 0.3,
-              fontFamily: 'ManropeSemiBold',
               color: following ? followTextColor : unfollowTextColor,
             },
             textStyle,
           ])}
         >
           {following ? t('Unfollow') : t('Follow')}
-        </Title>
+        </Body>
       </TouchableOpacity>
     </Animated.View>
   );

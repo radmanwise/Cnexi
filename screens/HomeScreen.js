@@ -1,4 +1,3 @@
-// بالا اضافه کن
 import React, { useState, useRef, useEffect, memo } from 'react';
 import {
   View,
@@ -14,7 +13,7 @@ import {
 import { TabView } from 'react-native-tab-view';
 import HomeNavigationBar from '../navigation/home/HomeNavigationBar';
 import PostScreen from '../components/post/PostScreen';
-import { Subtitle, Title } from '../components/ui/Typography';
+import { Subtitle, Body } from '../components/ui/Typography';
 
 const SkeletonBox = ({ width, height, borderRadius = 8, style }) => {
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
@@ -88,9 +87,9 @@ const MemoTabBar = memo(({ index, setIndex, routes, loading }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Subtitle style={[styles.tabText, isFocused && styles.tabTextActive]}>
+            <Body style={[styles.tabText, isFocused && styles.tabTextActive]}>
               {route.title}
-            </Subtitle>
+            </Body>
           </TouchableOpacity>
         );
       })}
@@ -214,13 +213,13 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 18,
     backgroundColor: '#f0f0f0',
-    borderRadius: 15,
+    borderRadius: 10,
   },
   tabItemActive: {
-    backgroundColor: '#333',
+    backgroundColor: '#008CFF',
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 12.5,
     color: '#000',
   },
   tabTextActive: {

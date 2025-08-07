@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "Cnexi",
-    "slug": "Cnexi",
+    "slug": "cnexi",
     "version": "0.1.5",
     "orientation": "portrait",
-    "icon": "./assets/img/app/cnexi.png",
+    "icon": "./assets/img/app/cnexi.jpg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -17,14 +17,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/img/app/cnexi.png",
+        "foregroundImage": "./assets/img/app/cnexi.jpg",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.cnexi.app"
     },
     "web": {
-      "favicon": "./assets/img/app/cnexi.png"
+      "favicon": "./assets/img/app/cnexi.jpg"
     },
     "plugins": [
       "expo-secure-store"

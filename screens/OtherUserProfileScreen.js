@@ -12,7 +12,7 @@ import { Animated } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Easing } from 'react-native-reanimated';
-import { Subtitle, Title } from '../components/ui/Typography';
+import { Subtitle, Title, Body } from '../components/ui/Typography';
 import {
   View,
   Text,
@@ -128,18 +128,18 @@ export default function OtherUserProfileScreen({ route }) {
 
     return (
       <View style={styles.bioContainer}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setShowFullBio(!showFullBio)}
-              style={styles.bioContainer}
-            >
-              <Subtitle style={styles.biography}>
-                {showFullBio ? profileData?.bio : truncateText(profileData?.bio || '', MAX_BIO_LENGTH)}
-              </Subtitle>
-              {!showFullBio && (profileData?.bio?.length || 0) > MAX_BIO_LENGTH && (
-                <Text style={styles.seeMoreText}></Text>
-              )}
-            </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => setShowFullBio(!showFullBio)}
+          style={styles.bioContainer}
+        >
+          <Subtitle style={styles.biography}>
+            {showFullBio ? profileData?.bio : truncateText(profileData?.bio || '', MAX_BIO_LENGTH)}
+          </Subtitle>
+          {!showFullBio && (profileData?.bio?.length || 0) > MAX_BIO_LENGTH && (
+            <Text style={styles.seeMoreText}></Text>
+          )}
+        </TouchableOpacity>
       </View>
     );
   };
@@ -213,10 +213,31 @@ export default function OtherUserProfileScreen({ route }) {
     fetchProfileData();
   }, []);
 
+
+  const SkeletonBox = ({ width, height, borderRadius = 6, style }) => (
+    <View
+      style={[
+        {
+          width,
+          height,
+          borderRadius,
+          backgroundColor: '#e0e0e0',
+          marginVertical: 4,
+        },
+        style,
+      ]}
+    />
+  );
+
+
+
+
+
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#000" animating={true} />
+        <ActivityIndicator size="small" color="#000" animating={true} />
       </View>
     );
   }
@@ -305,7 +326,7 @@ export default function OtherUserProfileScreen({ route }) {
               />
             </TouchableOpacity>
 
-            <Subtitle style={styles.username}>{truncateText(profileData?.username_i || 'username', 12)}</Subtitle>
+            <Body style={styles.username}>{truncateText(profileData?.username_i || 'username', 12)}</Body>
 
             <View style={styles.buttonStyle}>
               {currentUserSlug && profileData?.username_i && currentUserSlug === profileData.username_i ? (
@@ -377,7 +398,7 @@ export default function OtherUserProfileScreen({ route }) {
               <TouchableOpacity
                 onPress={() => navigation.navigate('FollowingScreen', { userId })}
                 style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Title style={styles.count}>{formattedFollowingCount}</Title>
+                <Body style={styles.count}>{formattedFollowingCount}</Body>
                 <Subtitle style={styles.label}>{t('following')}</Subtitle>
               </TouchableOpacity>
             </View>
@@ -432,7 +453,6 @@ const styles = StyleSheet.create({
     marginTop: '9%',
     color: 'black'
   },
-
   buttonStyle: {
     marginTop: 20,
     position: 'absolute',

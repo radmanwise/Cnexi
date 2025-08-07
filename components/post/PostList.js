@@ -14,7 +14,7 @@ import ReelIcon from '../../components/icons/reelIcon';
 import ImageIcon from '../../components/icons/ImageIcon';
 import ImageOffIcon from '../../components/icons/ImageOffIcon';
 import FastImage from 'expo-fast-image';
-import { Title, Subtitle } from '../../components/ui/Typography';
+import { Title, Subtitle, Body } from '../../components/ui/Typography';
 import AllIcon from '../../components/icons/AllIcon';
 import MusicIcon from '../../components/icons/MusicIcon';
 import ReelsIcon from '../../components/icons/ReelsIcon';
@@ -122,14 +122,14 @@ const PostList = ({ posts, fetchPosts }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Subtitle
+            <Body
               style={[
                 styles.tabText,
                 index === i && styles.tabTextFocused
               ]}
             >
               {route.title}
-            </Subtitle>
+            </Body>
           </TouchableOpacity>
 
         );
@@ -224,14 +224,14 @@ const styles = StyleSheet.create({
     gap: 15
   },
   tabItem: {
-    paddingVertical: 5,
+    paddingVertical: 6,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: '#f2f2f2', 
     marginHorizontal: 4,
   },
   tabItemFocused: {
-    backgroundColor: '#222222',
+    backgroundColor: '#008CFF',
   },
   tabText: {
     fontSize: 12,

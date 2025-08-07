@@ -1,22 +1,23 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import * as NavigationBar from 'expo-navigation-bar';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import VideoItem from '../components/reels/VideoItem';
+import { useReelsData } from '../hooks/useReelsData';
+import { animateScale } from '../utils/animations';
+import { Animated, Dimensions} from 'react-native';
+import styles from '../theme/reels/styles';
+import { Title, Subtitle } from '../components/ui/Typography';
 import {
   View,
-  StyleSheet,
   FlatList,
   ActivityIndicator,
   StatusBar,
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as NavigationBar from 'expo-navigation-bar';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import * as Font from 'expo-font';
-import VideoItem from '../components/reels/VideoItem';
-import { useReelsData } from '../hooks/useReelsData';
-import { animateScale } from '../utils/animations';
-import { Animated, Dimensions, Text } from 'react-native';
-import styles from '../theme/reels/styles';
+
+
 
 const ReelsScreen = () => {
   const navigation = useNavigation();
@@ -31,7 +32,6 @@ const ReelsScreen = () => {
     fetchMore,    
     hasMore,    
   } = useReelsData();
-
 
 
   const videoRefs = useRef({});
@@ -51,19 +51,6 @@ const ReelsScreen = () => {
     setCurrentPlayingIndex(index);
   };
 
-
-  // Load fonts
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        'Manrope': require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
-        'ManropeSemiBold': require('../assets/fonts/Manrope/Manrope-SemiBold.ttf'),
-      });
-      setFontsLoaded(true);
-    }
-    loadFonts();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -181,9 +168,6 @@ const ReelsScreen = () => {
     });
   }, [handleVideoPress]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
 
   if (loading) {
     return (
@@ -196,9 +180,9 @@ const ReelsScreen = () => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Subtitle style={styles.errorText}>{error}</Subtitle>
         <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Subtitle style={styles.retryButtonText}>Retry</Subtitle>
         </TouchableOpacity>
       </View>
     );

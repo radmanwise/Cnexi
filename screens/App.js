@@ -42,10 +42,9 @@ import {
   About,
   Block,
   OtpRegisterScreen,
-  SplashScreen,
+  SplashScreenComponent,
 }
   from '../screens';
-
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -296,25 +295,24 @@ export default function App() {
     ManropeBold: require('../assets/fonts/Manrope/Manrope-Bold.ttf'),
     ManropeMedium: require('../assets/fonts/Manrope/Manrope-Medium.ttf'),
     ManropeRegular: require('../assets/fonts/Manrope/Manrope-Regular.ttf'),
+    ManropeSemiRegular: require('../assets/fonts/Manrope/Manrope-SemiBold.ttf'),
   });
 
-
   if (!fontsLoaded) return null;
+
   return (
-    <ThemeProvider>
+    <ThemeProvider theme={{}}>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="SplashScreen"
-          screenOptions={{
-            headerShown: false,
-          }}
+          screenOptions={{ headerShown: false }}
         >
-          <Stack.Screen options={{ title: 'Login', headerShown: false, }} name="LoginScreen" component={LoginScreen} />
+          <Stack.Screen name="SplashScreen" component={SplashScreenComponent} />
+          <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen
             name="RegisterScreen"
             component={RegisterScreen}
             options={{
-              title: '',
               headerShown: true,
               headerStyle: {
                 elevation: 0,
@@ -322,13 +320,13 @@ export default function App() {
                 borderBottomWidth: 0,
                 backgroundColor: '#fff',
               },
+              title: '',
             }}
           />
           <Stack.Screen
             name="OtpRegisterScreen"
             component={OtpRegisterScreen}
             options={{
-              title: '',
               headerShown: true,
               headerStyle: {
                 elevation: 0,
@@ -336,24 +334,12 @@ export default function App() {
                 borderBottomWidth: 0,
                 backgroundColor: '#fff',
               },
+              title: '',
             }}
           />
-          <Stack.Screen options={{ title: '', headerShown: false }} name="SubmitScreen" component={SubmitScreen} />
-          <Stack.Screen
-            name="SplashScreen"
-            component={SplashScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen name="home" component={HomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen
-            name="MainApp"
-            component={MainTabNavigator}
-            options={{
-              headerShown: false,
-            }}
-          />
+          <Stack.Screen name="SubmitScreen" component={SubmitScreen} />
+          <Stack.Screen name="home" component={HomeScreen} />
+          <Stack.Screen name="MainApp" component={MainTabNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>
@@ -403,7 +389,7 @@ const MainTabNavigator = () => {
 
 
 
-  const ACTIVE_COLOR = '#000000ff';
+  const ACTIVE_COLOR = '#008CFF';
   const INACTIVE_COLOR = '#888';
   const screenOptions = {
     tabBarShowLabel: true,

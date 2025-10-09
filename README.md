@@ -26,9 +26,9 @@
 ## Installation
 
 **Prerequisites:**  
-- [Node.js](https://nodejs.org/)  
-- [Expo CLI](https://docs.expo.dev/get-started/installation/)  
-- [Yarn](https://yarnpkg.com/)
+Nodejs
+Expo
+Yarn
 
 **Steps:**
 ```sh

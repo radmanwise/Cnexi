@@ -26,9 +26,9 @@
 ## Installation
 
 **Prerequisites:**  
-Nodejs
-Expo
-Yarn
+## Nodejs
+## Expo
+## Yarn
 
 **Steps:**
 ```sh

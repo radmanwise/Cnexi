@@ -13,9 +13,9 @@ import {
 import { TabView } from 'react-native-tab-view';
 import HomeNavigationBar from '../navigation/home/HomeNavigationBar';
 import PostScreen from '../components/post/PostScreen';
-import { Subtitle, Body } from '../components/ui/Typography';
+import { Subtitle, Body, Title } from '../components/ui/Typography';
 
-const SkeletonBox = ({ width, height, borderRadius = 8, style }) => {
+const SkeletonBox = ({ width, height, borderRadius = 10, style }) => {
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -51,7 +51,6 @@ const SkeletonBox = ({ width, height, borderRadius = 8, style }) => {
   );
 };
 
-// SkeletonTabBar (in loading state)
 const SkeletonTabBar = () => {
   return (
     <ScrollView
@@ -61,13 +60,12 @@ const SkeletonTabBar = () => {
       style={styles.tabBar}
     >
       {[1, 2, 3, 4].map((_, i) => (
-        <SkeletonBox key={i} width={80} height={32} borderRadius={20} style={{ marginRight: 10 }} />
+        <SkeletonBox key={i} width={80} height={32} borderRadius={10} style={{ marginRight: 10 }} />
       ))}
     </ScrollView>
   );
 };
 
-// MemoTabBar
 const MemoTabBar = memo(({ index, setIndex, routes, loading }) => {
   if (loading) return <SkeletonTabBar />;
 
@@ -87,9 +85,9 @@ const MemoTabBar = memo(({ index, setIndex, routes, loading }) => {
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Body style={[styles.tabText, isFocused && styles.tabTextActive]}>
+            <Title style={[styles.tabText, isFocused && styles.tabTextActive]}>
               {route.title}
-            </Body>
+            </Title>
           </TouchableOpacity>
         );
       })}
@@ -105,8 +103,6 @@ const tabRoutes = [
   { key: 'forYou', title: 'For you' },
   { key: 'followers', title: 'Following' },
   { key: 'news', title: 'News' },
-  { key: 'music', title: 'Music' },
-  { key: 'sports', title: 'Sports' },
 ];
 
 export default function HomeScreen() {
@@ -129,9 +125,9 @@ export default function HomeScreen() {
             <SkeletonBox width={100} height={12} borderRadius={6} style={{ marginLeft: 10 }} />
           </View>
 
-          <SkeletonBox width="95%" height={350} borderRadius={9} style={{ marginTop: 10, alignSelf: 'center'}} />
+          <SkeletonBox width="95%" height={350} borderRadius={9} style={{ marginTop: 10, alignSelf: 'center' }} />
 
-          <SkeletonBox width="40%" height={12} borderRadius={6} style={{ marginTop: 25, alignSelf: 'center',marginLeft: -215  }} />
+          <SkeletonBox width="40%" height={12} borderRadius={6} style={{ marginTop: 25, alignSelf: 'center', marginLeft: -215 }} />
         </View>
       );
     }
@@ -210,17 +206,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tabItem: {
-    paddingVertical: 7,
+    paddingVertical: 6,
     paddingHorizontal: 18,
     backgroundColor: '#f0f0f0',
-    borderRadius: 10,
+    borderRadius: 14,
   },
   tabItemActive: {
-    backgroundColor: '#008CFF',
+    backgroundColor: '#000000ff',
   },
   tabText: {
-    fontSize: 12.5,
-    color: '#000',
+    fontSize: 12,
+    color: '#000000ff',
   },
   tabTextActive: {
     color: '#fff',

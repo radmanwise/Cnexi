@@ -4,7 +4,7 @@
 import React from 'react';
 import Svg, { Circle, Path } from "react-native-svg";
 
-const MenuDotIcon = ({ size = 24, color = 'currentColor', strokeWidth = 1.6 }) => (
+const MenuDotIcon = ({ size = 24, color = 'red', strokeWidth = 1.6 }) => (
     <Svg
         width={size}
         height={size}

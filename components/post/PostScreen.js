@@ -1,20 +1,21 @@
-import { Video } from 'expo-av';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import FastImage from 'expo-fast-image';
+import * as SecureStore from 'expo-secure-store';
 import CommentButton from '../buttons/CommentButton';
 import CaptionWithMore from './caption/CaptionWithMore';
 import LikeButton from '../buttons/LikeButton';
 import SaveButton from '../buttons/SaveButton';
-import PostMenu from './PostMenu';
+import { Title, Subtitle, Body } from '../ui/Typography';
 import ipconfig from '../../config/ipconfig';
 import BadgeCheck from '../icons/BadgeCheck';
 import ZoomMediaModal from './ZoomMediaModal';
 import Maximize2Icon from '../icons/Maximize2Icon';
 import ShareButton from '../buttons/ShareButton';
-import { Title, Subtitle, Body } from '../ui/Typography';
+import ChartIcon from '../icons/ChartIcon';
+import PostMenu from './PostMenu';
+import axios from 'axios';
+import FastImage from 'expo-fast-image';
+import { Video } from 'expo-av';
 import {
   View,
   Text,
@@ -29,8 +30,8 @@ import {
 } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const POST_HEIGHT = SCREEN_HEIGHT * 0.50;
-const PROFILE_IMAGE_SIZE = 35;
+const POST_HEIGHT = SCREEN_HEIGHT * 0.55;
+const PROFILE_IMAGE_SIZE = 40;
 
 
 const PostScreen = ({ filter, scrollY }) => {
@@ -170,16 +171,28 @@ const PostScreen = ({ filter, scrollY }) => {
             navigation.navigate('OtherUserProfile', { slug: item.username });
           }}
         >
-
           <FastImage
             source={{ uri: item.profile_image }}
             style={styles.profileImage}
             cacheKey={`profile-${item.username}`}
           />
-          <Body style={styles.username}>{truncateText(item.username || 'username', 12)}</Body>
-          {item.username === 'voss' && <BadgeCheck />}
+
+          <View style={styles.userMeta}>
+            <View style={styles.usernameRow}>
+              <Title style={styles.username}>
+                {truncateText(item.username || 'username', 12)}
+              </Title>
+
+              {item.username === 'voss' && <BadgeCheck />}
+
+              <Body style={styles.date}>
+                · {item.files[0].created_at_humanized}
+              </Body>
+            </View>
+          </View>
         </TouchableOpacity>
-        <PostMenu style={{ left: 8 }} />
+
+        <PostMenu />
       </View>
     </View>
   ), [navigation, truncateText]);
@@ -233,7 +246,6 @@ const PostScreen = ({ filter, scrollY }) => {
                       style={styles.mediaContent}
                       source={{ uri: file.file }}
                       cache="web"
-                      resizeMode="cover"
                     />
                   </TouchableWithoutFeedback>
                 )}
@@ -259,6 +271,9 @@ const PostScreen = ({ filter, scrollY }) => {
 
     return (
       <View style={styles.mediaContainer}>
+        <View style={styles.captionContainer}>
+          <CaptionWithMore description={item.description} />
+        </View>
         {item.files?.[0]?.file?.endsWith('.mp4') ? (
           <>
             <TouchableWithoutFeedback onPress={() => handleVideoPress(index)}>
@@ -310,50 +325,56 @@ const PostScreen = ({ filter, scrollY }) => {
 
   const renderItem = useCallback(({ item, index }) => (
     <View style={styles.postContainer} onStartShouldSetResponder={() => true}>
+
       {renderPostHeader({ item })}
       {renderMediaContent({ item, index })}
 
       <View style={styles.actionsContainer}>
         <View style={styles.leftActions} onStartShouldSetResponder={() => true}>
-          <TouchableOpacity style={styles.iconWrapper}>
-            <LikeButton postId={item.id} initialLiked={item.is_liked} iconSize={27} />
-          </TouchableOpacity>
-          <View onStartShouldSetResponder={() => true}>
-            <TouchableOpacity style={[styles.iconWrapper, { marginLeft: -3 }]} >
-              <CommentButton postId={item.id} iconSize={28} />
+
+          <View style={styles.actionItem}>
+            <TouchableOpacity style={styles.iconWrapper}>
+              <LikeButton
+                postId={item.id}
+                initialLiked={item.is_liked}
+                iconSize={19}
+              />
             </TouchableOpacity>
+            <Body style={styles.actionCount}>{item.like_count}</Body>
           </View>
-          {/* <TouchableOpacity style={styles.iconWrapper}>
-            <ShareButton postId={item.id} iconColor="black" iconSize={23} />
-          </TouchableOpacity> */}
-        </View>
-        <View style={styles.rightActions}>
+
+          <View style={styles.actionItem}>
+            <TouchableOpacity style={[styles.iconWrapper, { marginLeft: -3 }]}>
+              <CommentButton postId={item.id} iconSize={19} />
+            </TouchableOpacity>
+            <Body style={styles.actionCount}>{item.comment_count}</Body>
+          </View>
+
+          <View style={styles.actionItem}>
+            <TouchableOpacity style={styles.iconWrapper}>
+              <SaveButton
+                postId={item.id}
+                initialSaved={item.is_saved}
+                iconSize={17}
+              />
+            </TouchableOpacity>
+            <Body style={styles.actionCount}>{item.save_count}</Body>
+          </View>
+
+          <View style={styles.actionItem}>
+            <TouchableOpacity style={styles.iconWrapper}>
+              <ChartIcon iconSize={19} />
+            </TouchableOpacity>
+            <Body style={styles.actionCount}>112K</Body>
+          </View>
 
           <TouchableOpacity style={styles.iconWrapper}>
-            <SaveButton postId={item.id} initialSaved={item.is_saved} iconSize={24.3} />
+            <ShareButton iconColor="#737373ff" iconSize={23} />
           </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.captionContainer}>
-        <CaptionWithMore description={item.description} />
-      </View>
-
-      {item.hashtags && item.hashtags.length > 0 && (
-        <View style={styles.hashtagsContainer}>
-          {item.hashtags.map((tag, index) => (
-            <Subtitle key={index} style={styles.hashtagText}>#{tag.name}</Subtitle>
-          ))}
-        </View>
-      )}
-
-      <Body style={styles.date}>
-        {item.files[0].created_at_humanized}
-      </Body>
-      <View style={{ marginTop: 14 }}>
-
       </View>
     </View>
+
   ), [renderPostHeader, renderMediaContent]);
 
   useEffect(() => {
@@ -435,6 +456,7 @@ const PostScreen = ({ filter, scrollY }) => {
         showsVerticalScrollIndicator={false}
         scrollEnabled={!state.isModalVisible}
         contentContainerStyle={{ paddingTop: 140, zIndex: 1 }}
+        style={{ backgroundColor: '#ffffffff', gap: 10 }}
         onScroll={
           scrollY
             ? Animated.event(
@@ -463,73 +485,64 @@ const PostScreen = ({ filter, scrollY }) => {
 
 const styles = StyleSheet.create({
   postContainer: {
-    width: "SCREEN_WIDTH",
-    marginBottom: 10,
-    borderTopColor: '#ffff',
-    borderBottomColor: "#E0E0E0",
-    borderBottomWidth: 0.5,
+    borderColor: "#f1f1f1ff",
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    top: 4,
+    height: 'auto'
   },
   header: {
-    padding: 10,
-    backgroundColor: '#fff',
+    padding: 6,
   },
+
   profileStatus: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
+
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5
+    flexShrink: 1,
+    gap: 8,
   },
+
   profileImage: {
     height: PROFILE_IMAGE_SIZE,
     width: PROFILE_IMAGE_SIZE,
     borderRadius: PROFILE_IMAGE_SIZE / 2,
   },
+
+  userMeta: {
+    flexShrink: 1,
+  },
+
+  usernameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flexWrap: 'wrap', 
+  },
   username: {
     fontSize: 14,
-    marginLeft: 0,
-    color: 'black',
-    top: -2,
+    color: '#000',
   },
+
+  date: {
+    fontSize: 12.5,
+    color: '#aeaeaeff',
+  },
+
   mediaContainer: {
-    width: '95%',
-    height: POST_HEIGHT,
-    position: 'relative',
-    overflow: 'hidden',
-    borderRadius: 9,
-    justifyContent: 'center',
-    alignItems: 'center',
-    left: 8,
+    left: 55,
+    gap: 3
   },
-  // mediaContent: {
-  //   width: '120%',
-  //   height: '100%',
-  //   aspectRatio: 4 / 4,
-  //   borderRadius: 12,
-  //   backgroundColor: '#e2e2e2e8',
-  //   alignSelf: 'center',
-  // },
-  // videoZoomButton: {
-  //   position: 'absolute',
-  //   bottom: 15,
-  //   right: 345,
-  //   backgroundColor: '#00000088',
-  //   borderRadius: 50,
-  //   padding: 7,
-  // },
-
-
-
   mediaContent: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#ffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12
+    width: '85%',
+    height: POST_HEIGHT,
+    backgroundColor: '#dadadaff',
+    borderRadius: 14,
   },
   videoZoomButton: {
     position: 'absolute',
@@ -544,25 +557,21 @@ const styles = StyleSheet.create({
     height: POST_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffff',
+    backgroundColor: '#ffffffff',
     borderWidth: 0.3,
     borderColor: 'gray'
   },
-
-
   iconWrapper: {
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
   },
-
-
   slideContainer: {
     width: SCREEN_WIDTH * 0.95,
     height: POST_HEIGHT,
     overflow: 'hidden',
-    borderRadius: 12,
+    borderRadius: 14,
     backgroundColor: '#000',
     alignSelf: 'center',
   },
@@ -579,41 +588,30 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     marginHorizontal: 3,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffffff',
   },
   actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+  },
+  actionItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    backgroundColor: '#fff',
+    Left: 25,
+  },
+  actionCount: {
+    fontSize: 11,
+    color: '#737373ff',
+    right: 10,
   },
   leftActions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    width: '5%',
-    right: 15,
-  },
-  rightActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '40%',
-    left: 110,
+    gap: 20,
+    right: -36,
   },
   captionContainer: {
     paddingHorizontal: 15,
     paddingVertical: 5,
-    backgroundColor: '#fff',
-    flexDirection: 'row',
     alignItems: 'flex-start',
-    fontFamily: 'Manrope',
-  },
-  date: {
-    fontSize: 13,
-    color: '#aeaeaeff',
-    paddingHorizontal: 15,
-    paddingBottom: 2,
   },
   hashtagsContainer: {
     flexDirection: 'row',
@@ -621,7 +619,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingHorizontal: 12,
   },
-
   hashtagText: {
     color: '#000',
     backgroundColor: '#f0f0f0',
@@ -632,7 +629,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     fontSize: 13,
   },
-
 });
 
 export default PostScreen;

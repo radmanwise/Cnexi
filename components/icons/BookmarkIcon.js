@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-const BookmarkIcon = ({ size = 24, color = 'currentColor' }) => {
+const BookmarkIcon = ({ size = 19, color = 'currentColor' }) => {
   return (
     <Svg
       width={size}

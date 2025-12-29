@@ -51,19 +51,51 @@ const PostMenu = ({
     ]).start(() => setVisible(false));
   }, []);
 
-  useEffect(() => {
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+
+useEffect(() => {
+  if (visible) {
     Animated.parallel([
       Animated.spring(slideAnim, {
-        toValue: visible ? 1 : 0,
+        toValue: 1,
+        friction: 9, 
+        tension: 60, 
+        useNativeDriver: true,
+        overshootClamping: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 60,
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
-        toValue: visible ? 1 : 0,
-        duration: visible ? 250 : 200,
+        toValue: 1,
+        duration: 250,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [visible]);
+  } else {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 0.85,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setVisible(false));
+  }
+}, [visible]);
+
 
   const translateY = slideAnim.interpolate({
     inputRange: [0, 1],
@@ -79,7 +111,7 @@ const PostMenu = ({
     icon,
     dangerous = false,
     textStyle = {},
-    iconColor = '#262626'
+    iconColor = '#292828ff'
   } = {}) => (
     <TouchableOpacity
       style={[styles.option, dangerous && styles.dangerousOption]}
@@ -104,7 +136,7 @@ const PostMenu = ({
         onPress={open}
         activeOpacity={0.7}
       >
-        <MenuDotIcon size={22} color={'black'} />
+        <MenuDotIcon size={22} color={'#606060ff'} />
       </TouchableOpacity>
 
       <Modal
@@ -194,7 +226,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: '#00000040',
     justifyContent: 'flex-end',
   },
   overlayTouch: {
@@ -202,47 +234,56 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 20,
-    paddingTop: 8,
-    paddingHorizontal: 18,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 24,
+    paddingTop: 12,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   indicator: {
     width: 40,
-    height: 5,
-    backgroundColor: '#999',
-    borderRadius: 3,
+    height: 4,
+    backgroundColor: '#CCC',
+    borderRadius: 2,
   },
   content: {
-    gap: 16,
+    gap: 18,
   },
   optionGroup: {
-    gap: 8,
+    gap: 10,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    transition: 'background-color 0.2s',
   },
   dangerousOption: {
-    backgroundColor: 'rgba(255, 59, 48, 0.05)',
+    backgroundColor: 'rgba(255, 59, 48, 0.08)',
   },
   optionIconContainer: {
-    width: 30,
+    width: 32,
     alignItems: 'center',
   },
   optionText: {
-    fontSize: 16,
-    fontFamily: 'Manrope', 
+    fontSize: 14,
+    fontFamily: 'Manrope',
+    marginLeft: 8,
+    color: '#262626',
   },
   boldText: {
     fontWeight: '600',
   },
 });
+

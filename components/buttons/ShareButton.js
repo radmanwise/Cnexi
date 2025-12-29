@@ -12,14 +12,14 @@ import {
   Platform,
   Animated
 } from 'react-native';
-import NetworkIcon from '../../components/icons/NetworkIcon';
+import ShareIcon from '../../components/icons/ShareIcon';
 import TelegramIcon from '../../components/icons/TelegramIcon';
 import InstagramIcon from '../../components/icons/InstagramIcon';
 import WhatsAppIcon from '../../components/icons/WhatsAppIcon';
 import LinkIcon from '../../components/icons/LinkIcon';
 import DownloadIcon from '../../components/icons/DownloadIcon';
 
-const ShareButton = ({ postData, iconSize = 26, iconColor = '#000' }) => {
+const ShareButton = ({ postData, iconSize = 26, iconColor = '#737373ff' }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -135,7 +135,7 @@ const ShareButton = ({ postData, iconSize = 26, iconColor = '#000' }) => {
         style={styles.button}
         disabled={isSharing}
       >
-        <NetworkIcon size={iconSize} color={iconColor} />
+        <ShareIcon size={iconSize} color={iconColor} />
       </TouchableOpacity>
 
       <Modal

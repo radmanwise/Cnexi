@@ -14,7 +14,7 @@ import TelegramIcon from '../../components/icons/TelegramIcon';
 import LikeIcon from '../../components/icons/LikeIcon';
 import DisLikeIcon from '../../components/icons/DisLikeIcon';
 
-const CommentsButton = ({ postId, iconSize = 28, iconColor = '#000' }) => {
+const CommentsButton = ({ postId, iconSize = 28, iconColor = '#737373ff' }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isReplyModalVisible, setReplyModalVisible] = useState(false);
   const [replyText, setReplyText] = useState('');

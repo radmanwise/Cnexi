@@ -389,7 +389,7 @@ const MainTabNavigator = () => {
 
 
 
-  const ACTIVE_COLOR = '#008CFF';
+  const ACTIVE_COLOR = '#030303ff';
   const INACTIVE_COLOR = '#888';
   const screenOptions = {
     tabBarShowLabel: true,

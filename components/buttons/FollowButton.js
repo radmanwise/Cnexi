@@ -8,7 +8,7 @@ import { Title, Subtitle, Body, Caption } from '../ui/Typography';
 
 const COLORS = {
   primary: '#008CFF',
-  white: '#FFFFFF',
+  white: '#ffffffff',
 };
 
 const FollowButton = ({
@@ -25,6 +25,8 @@ const FollowButton = ({
   paddingVertical = 8,
   paddingHorizontal = 16,
   fontSize = 11,
+
+
 }) => {
   const { t } = useTranslation();
   const [following, setFollowing] = useState(initialIsFollowing);
@@ -90,7 +92,7 @@ const FollowButton = ({
           buttonStyle,
         ])}
       >
-        <Body
+        <Title
           style={StyleSheet.flatten([
             {
               fontSize,
@@ -101,7 +103,7 @@ const FollowButton = ({
           ])}
         >
           {following ? t('Unfollow') : t('Follow')}
-        </Body>
+        </Title>
       </TouchableOpacity>
     </Animated.View>
   );

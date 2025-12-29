@@ -9,84 +9,34 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Video } from 'expo-av';
 import ipconfig from '../../config/ipconfig';
-import { Ionicons } from '@expo/vector-icons';
 import ReelIcon from '../../components/icons/reelIcon';
 import ImageIcon from '../../components/icons/ImageIcon';
 import ImageOffIcon from '../../components/icons/ImageOffIcon';
 import FastImage from 'expo-fast-image';
 import { Title, Subtitle, Body } from '../../components/ui/Typography';
-import AllIcon from '../../components/icons/AllIcon';
 import MusicIcon from '../../components/icons/MusicIcon';
-import ReelsIcon from '../../components/icons/ReelsIcon';
 import { FlashList } from '@shopify/flash-list';
-
+import PostScreen from '../post/PostScreen'
 
 const screenWidth = Dimensions.get('window').width;
-const itemSize = screenWidth / 3;
-
-const FileTypeIcon = {
-  video: <ReelIcon size={20} color="white" />,
-  music: <MusicIcon size={20} color="white" />,
-  image: <ImageIcon size={26} color="white" />,
-};
 
 const Post = React.memo(({ post }) => {
-  const navigation = useNavigation();
-  const fileUri = `${ipconfig.BASE_URL}${post.files[0]}`;
-  const fileType = fileUri.endsWith('.mp4')
-    ? 'video'
-    : fileUri.endsWith('.mp3')
-      ? 'music'
-      : 'image';
-
-  const handlePress = useCallback(() => {
-    navigation.navigate('PostDetailScreen', {
-      postId: post.id,
-      postTitle: post.title,
-      postContent: post.content,
-      files: post.files,
-    });
-  }, [navigation, post]);
-
   return (
-    <TouchableOpacity
-      style={styles.postContainer}
-      onPress={handlePress}
-      activeOpacity={0.8}
-    >
-      <View style={styles.mediaContainer}>
-        {fileType === 'video' ? (
-          <Video
-            source={{ uri: fileUri }}
-            style={styles.video}
-            resizeMode="cover"
-            isLooping
-            useNativeControls={false}
-            shouldPlay={false}
-            isMuted
-          />
-        ) : (
-          <FastImage
-            source={{ uri: fileUri }}
-            style={styles.postImage}
-            resizeMode="cover"
-          />
-        )}
-        <View style={styles.postType}>{FileTypeIcon[fileType]}</View>
-      </View>
-    </TouchableOpacity>
+    <View style={styles.postContainer}>
+      <PostScreen post={post} />
+    </View>
   );
 }, (prev, next) => prev.post.id === next.post.id);
 
 const PostList = ({ posts, fetchPosts }) => {
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'all', title: 'Posts', icon: <AllIcon size={25} color="gray" /> },
-    { key: 'reels', title: 'Reels', icon: <ReelsIcon size={25} color="gray" /> },
-    { key: 'music', title: 'Music', icon: <MusicIcon size={25} color="gray" /> },
-  ]);
-
   const [refreshing, setRefreshing] = useState(false);
+
+  const routes = [
+    { key: 'all', title: 'Posts' },
+    { key: 'reels', title: 'Reels' },
+    { key: 'music', title: 'Music' },
+  ];
 
   const validPosts = useMemo(() => posts?.filter(p => p.id) || [], [posts]);
 
@@ -115,48 +65,32 @@ const PostList = ({ posts, fetchPosts }) => {
         return (
           <TouchableOpacity
             key={route.key}
-            style={[
-              styles.tabItem,
-              index === i && styles.tabItemFocused
-            ]}
+            style={styles.tabItem}
             onPress={() => setIndex(i)}
             activeOpacity={0.8}
           >
-            <Body
-              style={[
-                styles.tabText,
-                index === i && styles.tabTextFocused
-              ]}
-            >
+            <Title style={[styles.tabText, focused && styles.tabTextFocused]}>
               {route.title}
-            </Body>
+            </Title>
+            {focused && <View style={styles.indicator} />}
           </TouchableOpacity>
-
         );
       })}
     </View>
   );
 
   const filteredPosts = filterPosts(routes[index].key);
-  const renderItem = useCallback(({ item }) => <Post post={item} />, []);
+
   return (
     <View style={{ flex: 1 }}>
       {renderTabBar()}
       <FlashList
         data={filteredPosts}
         keyExtractor={item => `post-${item.id}`}
-        numColumns={3}
-        renderItem={renderItem}
-        estimatedItemSize={itemSize * 1.1}
-        columnWrapperStyle={styles.columnWrapper}
+        renderItem={({ item }) => <Post post={item} />}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        onEndReachedThreshold={0.3}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews
-        initialNumToRender={9}
-        maxToRenderPerBatch={9}
-        windowSize={5}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
             <ImageOffIcon size={40} color="#424242" />
@@ -173,29 +107,41 @@ const PostList = ({ posts, fetchPosts }) => {
 
 const styles = StyleSheet.create({
   postContainer: {
-    width: itemSize,
-    height: itemSize,
-    top: 2
+    backgroundColor: '#fff',
+    top: -130,
   },
-  mediaContainer: {
-    flex: 1,
+  tabBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    paddingVertical: 12,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e1e1e1',
+  },
+  tabItem: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
     position: 'relative',
   },
-  postImage: {
-    width: '99%',
-    height: '99%',
-  },
-  video: {
-    width: '99%',
-    height: '99%',
-  },
-  postType: {
+  indicator: {
     position: 'absolute',
-    top: 5,
-    right: 10,
+    bottom: -12,
+    left: 0,
+    right: 0,
+    height: 3.5,
+    backgroundColor: '#000000',
+    borderRadius: 100,
+    width: 80,
   },
-  columnWrapper: {
-    justifyContent: 'space-between',
+  tabText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#020130',
+  },
+  tabTextFocused: {
+    color: '#000000',
   },
   emptyContainer: {
     marginTop: 50,
@@ -212,34 +158,7 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 5,
     textAlign: 'center',
-    width: '80%'
-  },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingVertical: 15,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#e0e0e0',
-    gap: 15
-  },
-  tabItem: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    backgroundColor: '#f2f2f2', 
-    marginHorizontal: 4,
-  },
-  tabItemFocused: {
-    backgroundColor: '#008CFF',
-  },
-  tabText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
-  },
-  tabTextFocused: {
-    color: '#ffffff',
+    width: '80%',
   },
 });
 

@@ -6,7 +6,7 @@ import BookmarkIcon from '../../components/icons/BookmarkIcon';
 import BookmarkIconSold from '../../components/icons/BookmarkIconSold';
 import ipconfig from '../../config/ipconfig';
 
-const SaveButton = ({ postId, initialSaved, onSaveError, iconSize = 24, iconColor = '#000' }) => {
+const SaveButton = ({ postId, initialSaved, onSaveError, iconSize = 19, iconColor = '#737373ff' }) => {
   const [saved, setSaved] = useState(initialSaved);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -89,9 +89,9 @@ const SaveButton = ({ postId, initialSaved, onSaveError, iconSize = 24, iconColo
       disabled={isLoading}
     >
       {saved ? (
-       <BookmarkIconSold size={iconSize} color="#000000ff" />
+       <BookmarkIconSold size={iconSize} color="#737373ff" />
      ) : (
-       <BookmarkIcon size={iconSize} color={iconColor} />
+       <BookmarkIcon size={iconSize} color="#737373ff" />
      )} 
     </TouchableOpacity>
   );

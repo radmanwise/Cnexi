@@ -6,7 +6,7 @@ import LikeIcon from '../../components/icons/LikeIcon';
 import LikeSolidIcon from '../../components/icons/LikeSolidIcon';
 import ipconfig from '../../config/ipconfig';
 
-const LikeButton = ({ postId, initialLiked, onLikeError, iconColor = "#000", iconSize = 27 }) => {
+const LikeButton = ({ postId, initialLiked, onLikeError, iconColor = "#737373ff", iconSize = 27 }) => {
   const [liked, setLiked] = useState(initialLiked);
   const [isLoading, setIsLoading] = useState(false);
 
